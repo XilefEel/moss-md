@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { minimalSetup } from "codemirror";
 import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { markdown } from "@codemirror/lang-markdown";
@@ -21,15 +22,22 @@ export default function Editor({
       state: EditorState.create({
         doc: content,
         extensions: [
-          markdown({ codeLanguages: languages }),
+          minimalSetup,
+          markdown({ codeLanguages: languages, addKeymap: true }),
+          EditorView.lineWrapping,
+          EditorView.theme({
+            "&": { height: "100%" },
+            ".cm-scroller": {
+              overflow: "auto",
+              fontFamily: "JetBrains Mono, monospace",
+            },
+            ".cm-focused": { outline: "none" },
+            ".cm-gutters": { display: "none" },
+          }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               onChange(update.state.doc.toString());
             }
-          }),
-          EditorView.theme({
-            "&": { height: "100%" },
-            ".cm-scroller": { overflow: "auto" },
           }),
         ],
       }),
@@ -40,5 +48,9 @@ export default function Editor({
     return () => view.destroy();
   }, []);
 
-  return <div ref={containerRef} className="h-full text-sm" />;
+  return (
+    <div className="h-full text-base">
+      <div ref={containerRef} className="mx-auto max-w-2xl" />
+    </div>
+  );
 }

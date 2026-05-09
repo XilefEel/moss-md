@@ -5,6 +5,7 @@ import Toolbar from "./components/Toolbar";
 import Editor from "./components/Editor";
 import Viewer from "./components/Viewer";
 import "./App.css";
+import Titlebar from "./components/Titlebar";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -40,19 +41,22 @@ export default function App() {
 
   return (
     <div className="flex h-screen flex-col bg-white dark:bg-zinc-900">
-      <Toolbar
-        mode={mode}
-        onOpen={handleOpen}
-        onSave={handleSave}
-        onToggle={() => setMode(mode === "view" ? "edit" : "view")}
-      />
+      <Titlebar />
 
-      <div className="flex-1 overflow-auto p-8">
-        {mode === "edit" ? (
-          <Editor content={content} onChange={setContent} />
-        ) : (
-          <Viewer content={content} />
-        )}
+      <div className="pt-8">
+        <Toolbar
+          mode={mode}
+          onOpen={handleOpen}
+          onSave={handleSave}
+          onToggle={() => setMode(mode === "view" ? "edit" : "view")}
+        />
+        <div className="flex-1 overflow-auto p-8">
+          {mode === "edit" ? (
+            <Editor content={content} onChange={setContent} />
+          ) : (
+            <Viewer content={content} />
+          )}
+        </div>
       </div>
     </div>
   );
