@@ -1,1 +1,25 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+  @font-face {
+    font-family: "Inter";
+    src: url("./assets/fonts/Inter.ttf") format("truetype");
+  }
+
+  @font-face {
+    font-family: "JetBrainsMono";
+    src: url("./assets/fonts/JetBrainsMono.ttf") format("truetype");
+  }
+
+  body {
+    font-family: "Inter", sans-serif;
+  }
+
+  code,
+  pre {
+    font-family: "JetBrainsMono", monospace;
+  }
+}
