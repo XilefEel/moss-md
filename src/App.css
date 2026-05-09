@@ -42,6 +42,34 @@
   background: transparent;
 }
 
+.prose {
+  --tw-prose-body: theme(colors.zinc.700);
+  --tw-prose-headings: theme(colors.zinc.900);
+  --tw-prose-links: theme(colors.zinc.900);
+  --tw-prose-bold: theme(colors.zinc.900);
+  --tw-prose-quotes: theme(colors.zinc.600);
+  --tw-prose-hr: theme(colors.zinc.200);
+  --tw-prose-bullets: theme(colors.zinc.400);
+}
+
+.dark .prose {
+  --tw-prose-body: theme(colors.zinc.300);
+  --tw-prose-headings: theme(colors.zinc.100);
+  --tw-prose-links: theme(colors.zinc.100);
+  --tw-prose-bold: theme(colors.zinc.100);
+  --tw-prose-quotes: theme(colors.zinc.400);
+  --tw-prose-hr: theme(colors.zinc.800);
+  --tw-prose-bullets: theme(colors.zinc.600);
+}
+
 .cm-editor.cm-focused {
   outline: none !important;
+}
+
+.cm-content {
+  color: theme(--color-zinc-700);
+}
+
+.dark .cm-content {
+  color: theme(--color-zinc-300);
 }
