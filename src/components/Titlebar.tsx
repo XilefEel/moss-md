@@ -1,6 +1,8 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Eye, Moon, Pencil, Sun } from "lucide-react";
 
+const appWindow = getCurrentWindow();
+
 export default function Titlebar({
   mode,
   isDark,
@@ -16,8 +18,6 @@ export default function Titlebar({
   onToggle: () => void;
   onToggleDark: () => void;
 }) {
-  const appWindow = getCurrentWindow();
-
   return (
     <div
       data-tauri-drag-region

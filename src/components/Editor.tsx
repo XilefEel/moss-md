@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import { minimalSetup } from "codemirror";
 import { EditorView } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
+
+const themeCompartment = new Compartment();
 
 const lightTheme = EditorView.theme(
   {
@@ -74,8 +76,10 @@ export default function Editor({
         extensions: [
           minimalSetup,
           markdown({ codeLanguages: languages }),
-          isDark ? darkTheme : lightTheme,
-          syntaxHighlighting(isDark ? darkHighlight : lightHighlight),
+          themeCompartment.of([
+            isDark ? darkTheme : lightTheme,
+            syntaxHighlighting(isDark ? darkHighlight : lightHighlight),
+          ]),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) onChange(update.state.doc.toString());
           }),
@@ -86,6 +90,17 @@ export default function Editor({
 
     viewRef.current = view;
     return () => view.destroy();
+  }, []);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+
+    viewRef.current.dispatch({
+      effects: themeCompartment.reconfigure([
+        isDark ? darkTheme : lightTheme,
+        syntaxHighlighting(isDark ? darkHighlight : lightHighlight),
+      ]),
+    });
   }, [isDark]);
 
   return (

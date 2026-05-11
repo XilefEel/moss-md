@@ -54,12 +54,17 @@ export default function App() {
       const dark = await getIsDark();
       const lastFile = await getLastFilePath();
 
+      console.log("dark:", dark);
+      console.log("lastFile:", lastFile);
+
       if (dark !== null) setIsDark(dark);
+
       if (lastFile) {
         const text = await readTextFile(lastFile);
         setFilePath(lastFile);
         setContent(text);
       }
+
       setLoaded(true);
     }
     loadSettings();
