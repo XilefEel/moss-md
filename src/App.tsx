@@ -5,10 +5,16 @@ import Editor from "./components/Editor";
 import Viewer from "./components/Viewer";
 import "./App.css";
 import Titlebar from "./components/Titlebar";
+import {
+  getIsDark,
+  getLastFilePath,
+  saveIsDark,
+  saveLastFilePath,
+} from "./lib/storage";
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
-
+  const [loaded, setLoaded] = useState(false);
   const [content, setContent] = useState("");
   const [filePath, setFilePath] = useState<string | null>(null);
   const [mode, setMode] = useState<"view" | "edit">("view");
@@ -44,8 +50,33 @@ export default function App() {
   };
 
   useEffect(() => {
+    async function loadSettings() {
+      const dark = await getIsDark();
+      const lastFile = await getLastFilePath();
+
+      if (dark !== null) setIsDark(dark);
+      if (lastFile) {
+        const text = await readTextFile(lastFile);
+        setFilePath(lastFile);
+        setContent(text);
+      }
+      setLoaded(true);
+    }
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
   }, [isDark]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    saveIsDark(isDark);
+  }, [isDark, loaded]);
+
+  useEffect(() => {
+    if (filePath) saveLastFilePath(filePath);
+  }, [filePath]);
 
   return (
     <div className="flex h-screen flex-col bg-white dark:bg-zinc-900">
