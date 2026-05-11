@@ -4,13 +4,63 @@ import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
+import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { tags as t } from "@lezer/highlight";
+
+const lightTheme = EditorView.theme(
+  {
+    "&": { backgroundColor: "transparent" },
+    ".cm-content": { caretColor: "#71717a", color: "#3f3f46" },
+    ".cm-focused": { outline: "none" },
+    ".cm-gutters": { display: "none" },
+    "&.cm-focused .cm-cursor": { borderLeftColor: "#71717a" },
+    "&.cm-focused .cm-selectionBackground, ::selection": {
+      backgroundColor: "#e4e4e7",
+    },
+  },
+  { dark: false },
+);
+
+const darkTheme = EditorView.theme(
+  {
+    "&": { backgroundColor: "transparent" },
+    ".cm-content": { caretColor: "#a1a1aa", color: "#d4d4d8" },
+    ".cm-focused": { outline: "none" },
+    ".cm-gutters": { display: "none" },
+    "&.cm-focused .cm-cursor": { borderLeftColor: "#a1a1aa" },
+    "&.cm-focused .cm-selectionBackground, ::selection": {
+      backgroundColor: "#3f3f46",
+    },
+  },
+  { dark: true },
+);
+
+const lightHighlight = HighlightStyle.define([
+  { tag: t.heading, color: "#18181b" },
+  { tag: t.strong, color: "#18181b" },
+  { tag: t.emphasis, color: "#3f3f46" },
+  { tag: t.punctuation, color: "#a1a1aa" },
+  { tag: t.url, color: "#a1a1aa" },
+  { tag: t.quote, color: "#71717a" },
+]);
+
+const darkHighlight = HighlightStyle.define([
+  { tag: t.heading, color: "#f4f4f5" },
+  { tag: t.strong, color: "#f4f4f5" },
+  { tag: t.emphasis, color: "#d4d4d8" },
+  { tag: t.punctuation, color: "#52525b" },
+  { tag: t.url, color: "#52525b" },
+  { tag: t.quote, color: "#a1a1aa" },
+]);
 
 export default function Editor({
   content,
   onChange,
+  isDark,
 }: {
   content: string;
   onChange: (value: string) => void;
+  isDark: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -23,21 +73,11 @@ export default function Editor({
         doc: content,
         extensions: [
           minimalSetup,
-          markdown({ codeLanguages: languages, addKeymap: true }),
-          EditorView.lineWrapping,
-          EditorView.theme({
-            "&": { height: "100%" },
-            ".cm-scroller": {
-              overflow: "auto",
-              fontFamily: "JetBrains Mono, monospace",
-            },
-            ".cm-focused": { outline: "none" },
-            ".cm-gutters": { display: "none" },
-          }),
+          markdown({ codeLanguages: languages }),
+          isDark ? darkTheme : lightTheme,
+          syntaxHighlighting(isDark ? darkHighlight : lightHighlight),
           EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
-              onChange(update.state.doc.toString());
-            }
+            if (update.docChanged) onChange(update.state.doc.toString());
           }),
         ],
       }),
@@ -46,7 +86,7 @@ export default function Editor({
 
     viewRef.current = view;
     return () => view.destroy();
-  }, []);
+  }, [isDark]);
 
   return (
     <div className="h-full text-base">

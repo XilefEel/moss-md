@@ -60,7 +60,7 @@ export default function App() {
 
       <div className="flex-1 overflow-auto p-8 pt-16">
         {mode === "edit" ? (
-          <Editor content={content} onChange={setContent} />
+          <Editor content={content} onChange={setContent} isDark={isDark} />
         ) : (
           <Viewer content={content} />
         )}
