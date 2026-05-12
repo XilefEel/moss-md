@@ -11,6 +11,7 @@ import {
   saveIsDark,
   saveLastFilePath,
 } from "./lib/storage";
+import { Group, Panel, Separator } from "react-resizable-panels";
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
@@ -54,9 +55,6 @@ export default function App() {
       const dark = await getIsDark();
       const lastFile = await getLastFilePath();
 
-      console.log("dark:", dark);
-      console.log("lastFile:", lastFile);
-
       if (dark !== null) setIsDark(dark);
 
       if (lastFile) {
@@ -94,9 +92,19 @@ export default function App() {
         onToggleDark={() => setIsDark((prev) => !prev)}
       />
 
-      <div className="flex-1 overflow-auto p-8 pt-16">
+      <div className="flex-1 overflow-auto p-8 pt-16 pb-6">
         {mode === "edit" ? (
-          <Editor content={content} onChange={setContent} isDark={isDark} />
+          <Group>
+            <Panel className="pr-8" minSize={200}>
+              <Viewer content={content} />
+            </Panel>
+
+            <Separator className="w-px cursor-col-resize rounded-full bg-zinc-200 dark:bg-zinc-700" />
+
+            <Panel className="pl-8" minSize={200}>
+              <Editor content={content} onChange={setContent} isDark={isDark} />
+            </Panel>
+          </Group>
         ) : (
           <Viewer content={content} />
         )}
