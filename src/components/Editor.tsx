@@ -94,6 +94,16 @@ export default function Editor({
 
   useEffect(() => {
     if (!viewRef.current) return;
+    const current = viewRef.current.state.doc.toString();
+    if (current === content) return;
+
+    viewRef.current.dispatch({
+      changes: { from: 0, to: current.length, insert: content },
+    });
+  }, [content]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
 
     viewRef.current.dispatch({
       effects: themeCompartment.reconfigure([

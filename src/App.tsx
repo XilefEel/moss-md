@@ -12,28 +12,21 @@ import {
   saveLastFilePath,
 } from "./lib/storage";
 import { Group, Panel, Separator } from "react-resizable-panels";
+import Sidebar from "./components/Sidebar";
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [content, setContent] = useState("");
+
   const [filePath, setFilePath] = useState<string | null>(null);
+  const [currentDir, setCurrentDir] = useState<string | null>(null);
+
   const [mode, setMode] = useState<"view" | "edit">("view");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
   const charCount = content.length;
-
-  const handleOpen = async () => {
-    const path = await open({
-      filters: [{ name: "Markdown", extensions: ["md"] }],
-    });
-    if (!path) return;
-
-    const text = await readTextFile(path);
-
-    setFilePath(path);
-    setContent(text);
-  };
 
   const handleSave = async () => {
     if (!filePath) {
@@ -50,8 +43,20 @@ export default function App() {
     }
   };
 
+  const handleOpen = async () => {
+    const dir = await open({ directory: true });
+    if (!dir) return;
+    setCurrentDir(dir);
+  };
+
+  const handleSelectFile = async (path: string) => {
+    const text = await readTextFile(path);
+    setFilePath(path);
+    setContent(text);
+  };
+
   useEffect(() => {
-    async function loadSettings() {
+    const loadSettings = async () => {
       const dark = await getIsDark();
       const lastFile = await getLastFilePath();
 
@@ -64,7 +69,7 @@ export default function App() {
       }
 
       setLoaded(true);
-    }
+    };
     loadSettings();
   }, []);
 
@@ -101,6 +106,10 @@ export default function App() {
             e.preventDefault();
             setIsDark((prev) => !prev);
             break;
+          case "b":
+            e.preventDefault();
+            setIsSidebarOpen((prev) => !prev);
+            break;
         }
       }
     };
@@ -123,7 +132,20 @@ export default function App() {
       <div className="flex-1 overflow-auto p-8 pt-16 pb-6">
         {mode === "edit" ? (
           <Group>
-            <Panel className="pr-8" minSize={200}>
+            {isSidebarOpen && (
+              <>
+                <Panel minSize={200}>
+                  <Sidebar
+                    currentDir={currentDir}
+                    currentFile={filePath}
+                    onSelect={handleSelectFile}
+                  />
+                </Panel>
+                <Separator className="w-px cursor-col-resize bg-zinc-200 dark:bg-zinc-700" />
+              </>
+            )}
+
+            <Panel className="px-8" minSize={200}>
               <Viewer content={content} />
             </Panel>
 
