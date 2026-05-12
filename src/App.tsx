@@ -7,12 +7,20 @@ import "./App.css";
 import Titlebar from "./components/Titlebar";
 import {
   getIsDark,
+  getLastDir,
   getLastFilePath,
   saveIsDark,
+  saveLastDir,
   saveLastFilePath,
 } from "./lib/storage";
-import { Group, Panel, Separator } from "react-resizable-panels";
+import {
+  Group,
+  Panel,
+  Separator,
+  useDefaultLayout,
+} from "react-resizable-panels";
 import Sidebar from "./components/Sidebar";
+import { cn } from "./lib/utils";
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
@@ -47,20 +55,30 @@ export default function App() {
     const dir = await open({ directory: true });
     if (!dir) return;
     setCurrentDir(dir);
+    await saveLastDir(dir);
   };
 
   const handleSelectFile = async (path: string) => {
     const text = await readTextFile(path);
     setFilePath(path);
     setContent(text);
+    await saveLastFilePath(path);
   };
+
+  const { defaultLayout, onLayoutChanged } = useDefaultLayout({
+    id: "moss-layout",
+    storage: localStorage,
+  });
 
   useEffect(() => {
     const loadSettings = async () => {
       const dark = await getIsDark();
+      const lastDir = await getLastDir();
       const lastFile = await getLastFilePath();
 
       if (dark !== null) setIsDark(dark);
+
+      if (lastDir) setCurrentDir(lastDir);
 
       if (lastFile) {
         const text = await readTextFile(lastFile);
@@ -129,35 +147,46 @@ export default function App() {
         onToggleDark={() => setIsDark((prev) => !prev)}
       />
 
-      <div className="flex-1 overflow-auto p-8 pt-16 pb-6">
-        {mode === "edit" ? (
-          <Group>
-            {isSidebarOpen && (
-              <>
-                <Panel minSize={200}>
-                  <Sidebar
-                    currentDir={currentDir}
-                    currentFile={filePath}
-                    onSelect={handleSelectFile}
-                  />
-                </Panel>
-                <Separator className="w-px cursor-col-resize bg-zinc-200 dark:bg-zinc-700" />
-              </>
+      <div className="flex h-screen">
+        <Group defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
+          <Panel
+            id="sidebar"
+            minSize={200}
+            className={cn("px-8 pt-12 pb-6", !isSidebarOpen && "hidden")}
+          >
+            <Sidebar
+              currentDir={currentDir}
+              currentFile={filePath}
+              onSelect={handleSelectFile}
+            />
+          </Panel>
+
+          <Separator
+            className={cn(
+              "w-px cursor-col-resize bg-zinc-200 dark:bg-zinc-700",
+              !isSidebarOpen && "hidden",
             )}
+          />
 
-            <Panel className="px-8" minSize={200}>
-              <Viewer content={content} />
-            </Panel>
+          <Panel className="px-8 pt-12 pb-6">
+            <Viewer content={content} />
+          </Panel>
 
-            <Separator className="w-px cursor-col-resize rounded-full bg-zinc-200 dark:bg-zinc-700" />
+          <Separator
+            className={cn(
+              "w-px cursor-col-resize bg-zinc-200 dark:bg-zinc-700",
+              mode === "view" && "hidden",
+            )}
+          />
 
-            <Panel className="pl-8" minSize={200}>
-              <Editor content={content} onChange={setContent} isDark={isDark} />
-            </Panel>
-          </Group>
-        ) : (
-          <Viewer content={content} />
-        )}
+          <Panel
+            id="editor"
+            minSize={200}
+            className={cn("px-8 pt-12 pb-6", mode === "view" && "hidden")}
+          >
+            <Editor content={content} onChange={setContent} isDark={isDark} />
+          </Panel>
+        </Group>
       </div>
 
       <div className="fixed bottom-0 left-0 flex h-6 w-full items-center justify-end gap-4 bg-white/30 px-4 text-xs text-zinc-500 backdrop-blur-sm dark:bg-zinc-900/30 dark:text-zinc-400">

@@ -19,6 +19,9 @@ const buildTree = async (dirPath: string): Promise<Entry[]> => {
 
       if (entry.isDirectory) {
         const children = await buildTree(entryPath);
+
+        if (children.length === 0) return null;
+
         return {
           name: entry.name,
           path: entryPath,
@@ -33,11 +36,18 @@ const buildTree = async (dirPath: string): Promise<Entry[]> => {
           children: [],
         };
       }
+
       return null;
     }),
   );
 
-  return result.filter(Boolean) as Entry[];
+  return result
+    .filter((e) => e !== null)
+    .sort((a, b) => {
+      if (a.isDirectory && !b.isDirectory) return -1;
+      if (!a.isDirectory && b.isDirectory) return 1;
+      return 0;
+    }) as Entry[];
 };
 
 export default function Sidebar({

@@ -35,3 +35,11 @@ export async function getLastFilePath(): Promise<string | null> {
 export async function saveLastFilePath(path: string) {
   return setItem("lastFilePath", path);
 }
+
+export async function getLastDir(): Promise<string | null> {
+  return getItem<string>("lastDir");
+}
+
+export async function saveLastDir(path: string) {
+  return setItem("lastDir", path);
+}

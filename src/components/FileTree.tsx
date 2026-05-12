@@ -47,10 +47,14 @@ function FolderNode({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div>
+    <div className="mb-1">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1"
+        className={cn(
+          "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5",
+          "hover:bg-zinc-50 dark:hover:bg-zinc-800",
+          "truncate text-sm text-zinc-800 dark:text-zinc-100",
+        )}
       >
         {isOpen ? (
           <FolderOpen className="size-4 shrink-0" />
@@ -88,12 +92,15 @@ function FileNode({
     <button
       onClick={() => onSelect(entry.path)}
       className={cn(
-        "flex w-full items-center gap-1 rounded",
-        isActive && "bg-zinc-100",
+        "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5",
+        "truncate text-sm text-zinc-800 dark:text-zinc-100",
+        isActive
+          ? "bg-zinc-100 font-medium dark:bg-zinc-700"
+          : "hover:bg-zinc-50 dark:hover:bg-zinc-800",
       )}
     >
       <FileText className="size-4 shrink-0" />
-      {entry.name}
+      {entry.name.replace(/\.md$/, "")}
     </button>
   );
 }
