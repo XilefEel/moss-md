@@ -81,6 +81,34 @@ export default function App() {
     if (filePath) saveLastFilePath(filePath);
   }, [filePath]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case "s":
+            e.preventDefault();
+            handleSave();
+            break;
+          case "o":
+            e.preventDefault();
+            handleOpen();
+            break;
+          case "e":
+            e.preventDefault();
+            setMode((prev) => (prev === "view" ? "edit" : "view"));
+            break;
+          case "d":
+            e.preventDefault();
+            setIsDark((prev) => !prev);
+            break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [filePath, content]);
+
   return (
     <div className="flex h-screen flex-col bg-white dark:bg-zinc-900">
       <Titlebar
