@@ -1,20 +1,31 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Eye, Moon, Pencil, Sun } from "lucide-react";
+import {
+  Eye,
+  Moon,
+  PanelLeftOpen,
+  PanelRightOpen,
+  Pencil,
+  Sun,
+} from "lucide-react";
 
 const appWindow = getCurrentWindow();
 
 export default function Titlebar({
   mode,
+  isSidebarOpen,
   isDark,
   onOpen,
-  onToggleView,
+  onToggleMode,
+  onToggleSidebar,
   onToggleTheme,
 }: {
   mode: "view" | "edit";
+  isSidebarOpen: boolean;
   isDark: boolean;
   onOpen: () => void;
   onSave: () => void;
-  onToggleView: () => void;
+  onToggleMode: () => void;
+  onToggleSidebar: () => void;
   onToggleTheme: () => void;
 }) {
   return (
@@ -39,6 +50,16 @@ export default function Titlebar({
 
       <div className="flex items-center gap-2.5">
         <button
+          onClick={onToggleSidebar}
+          className="ml-auto text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+        >
+          {isSidebarOpen ? (
+            <PanelRightOpen className="size-4 shrink-0" />
+          ) : (
+            <PanelLeftOpen className="size-4 shrink-0" />
+          )}
+        </button>
+        <button
           onClick={onOpen}
           className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
         >
@@ -58,7 +79,7 @@ export default function Titlebar({
       </button>
 
       <button
-        onClick={onToggleView}
+        onClick={onToggleMode}
         className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
       >
         {mode === "view" ? (

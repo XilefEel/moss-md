@@ -8,7 +8,6 @@ export default function useTheme() {
     const theme = !isDark;
     setIsDark(theme);
     await saveIsDark(theme);
-    document.documentElement.classList.toggle("dark", theme);
   };
 
   useEffect(() => {
@@ -18,6 +17,10 @@ export default function useTheme() {
     };
     fetchTheme();
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
 
   return { isDark, toggleTheme };
 }

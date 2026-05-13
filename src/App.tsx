@@ -110,10 +110,12 @@ export default function App() {
     <div className="flex h-screen flex-col bg-white dark:bg-zinc-900">
       <Titlebar
         mode={mode}
+        isSidebarOpen={isSidebarOpen}
         isDark={isDark}
         onOpen={handleOpen}
         onSave={handleSave}
-        onToggleView={() => setMode(mode === "view" ? "edit" : "view")}
+        onToggleMode={() => setMode(mode === "view" ? "edit" : "view")}
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onToggleTheme={toggleTheme}
       />
 
@@ -122,7 +124,7 @@ export default function App() {
           <Panel
             id="sidebar"
             minSize="15%"
-            className="px-8 pt-12 pb-6"
+            className="pt-12 pb-6"
             panelRef={sidebarRef}
             collapsible
             onResize={(size) => {
@@ -139,7 +141,7 @@ export default function App() {
 
           <Separator
             className={cn(
-              "w-px cursor-col-resize bg-zinc-200 dark:bg-zinc-700",
+              "w-px cursor-col-resize bg-zinc-200 hover:bg-emerald-400 dark:bg-zinc-700 dark:hover:bg-emerald-500",
               !isSidebarOpen && "hidden",
             )}
           />
@@ -150,7 +152,7 @@ export default function App() {
 
           <Separator
             className={cn(
-              "w-px cursor-col-resize bg-zinc-200 dark:bg-zinc-700",
+              "w-px cursor-col-resize bg-zinc-200 hover:bg-emerald-400 dark:bg-zinc-700 dark:hover:bg-emerald-500",
               mode === "view" && "hidden",
             )}
           />
