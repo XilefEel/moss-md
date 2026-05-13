@@ -73,7 +73,7 @@ export default function Sidebar({
   }, [currentDir]);
 
   return (
-    <div>
+    <div className="h-full overflow-auto">
       {currentDir ? (
         <FileTree
           entries={entries}

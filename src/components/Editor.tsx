@@ -75,6 +75,7 @@ export default function Editor({
         doc: content,
         extensions: [
           minimalSetup,
+          EditorView.lineWrapping,
           markdown({ codeLanguages: languages }),
           themeCompartment.of([
             isDark ? darkTheme : lightTheme,

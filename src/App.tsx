@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import Editor from "./components/Editor";
@@ -16,6 +16,7 @@ import {
 import {
   Group,
   Panel,
+  PanelImperativeHandle,
   Separator,
   useDefaultLayout,
 } from "react-resizable-panels";
@@ -35,6 +36,14 @@ export default function App() {
 
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
   const charCount = content.length;
+
+  const sidebarRef = useRef<PanelImperativeHandle>(null);
+  const editorRef = useRef<PanelImperativeHandle>(null);
+
+  const { defaultLayout, onLayoutChanged } = useDefaultLayout({
+    id: "moss-layout",
+    storage: localStorage,
+  });
 
   const handleSave = async () => {
     if (!filePath) {
@@ -65,10 +74,11 @@ export default function App() {
     await saveLastFilePath(path);
   };
 
-  const { defaultLayout, onLayoutChanged } = useDefaultLayout({
-    id: "moss-layout",
-    storage: localStorage,
-  });
+  const handleToggleDark = async () => {
+    const theme = !isDark;
+    setIsDark(theme);
+    await saveIsDark(theme);
+  };
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -94,15 +104,6 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
   }, [isDark]);
-
-  useEffect(() => {
-    if (!loaded) return;
-    saveIsDark(isDark);
-  }, [isDark, loaded]);
-
-  useEffect(() => {
-    if (filePath) saveLastFilePath(filePath);
-  }, [filePath]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -136,6 +137,16 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [filePath, content]);
 
+  useEffect(() => {
+    if (isSidebarOpen) sidebarRef.current?.expand();
+    else sidebarRef.current?.collapse();
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    if (mode === "edit") editorRef.current?.expand();
+    else editorRef.current?.collapse();
+  }, [mode]);
+
   return (
     <div className="flex h-screen flex-col bg-white dark:bg-zinc-900">
       <Titlebar
@@ -144,15 +155,21 @@ export default function App() {
         onOpen={handleOpen}
         onSave={handleSave}
         onToggle={() => setMode(mode === "view" ? "edit" : "view")}
-        onToggleDark={() => setIsDark((prev) => !prev)}
+        onToggleDark={handleToggleDark}
       />
 
       <div className="flex h-screen">
         <Group defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
           <Panel
             id="sidebar"
-            minSize={200}
-            className={cn("px-8 pt-12 pb-6", !isSidebarOpen && "hidden")}
+            minSize="15%"
+            className="px-8 pt-12 pb-6"
+            panelRef={sidebarRef}
+            collapsible
+            onResize={(size) => {
+              if (size.asPercentage === 0) setIsSidebarOpen(false);
+              else setIsSidebarOpen(true);
+            }}
           >
             <Sidebar
               currentDir={currentDir}
@@ -168,7 +185,7 @@ export default function App() {
             )}
           />
 
-          <Panel className="px-8 pt-12 pb-6">
+          <Panel className="px-8 pt-12 pb-6" minSize="15%">
             <Viewer content={content} />
           </Panel>
 
@@ -181,8 +198,14 @@ export default function App() {
 
           <Panel
             id="editor"
-            minSize={200}
-            className={cn("px-8 pt-12 pb-6", mode === "view" && "hidden")}
+            minSize="15%"
+            className="px-8 pt-12 pb-6"
+            panelRef={editorRef}
+            collapsible
+            onResize={(size) => {
+              if (size.asPercentage === 0) setMode("view");
+              else setMode("edit");
+            }}
           >
             <Editor content={content} onChange={setContent} isDark={isDark} />
           </Panel>
