@@ -6,10 +6,8 @@ import Viewer from "./components/Viewer";
 import "./App.css";
 import Titlebar from "./components/Titlebar";
 import {
-  getIsDark,
   getLastDir,
   getLastFilePath,
-  saveIsDark,
   saveLastDir,
   saveLastFilePath,
 } from "./lib/storage";
@@ -22,10 +20,11 @@ import {
 } from "react-resizable-panels";
 import Sidebar from "./components/Sidebar";
 import { cn } from "./lib/utils";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import BottomBar from "./components/BottomBar";
+import useTheme from "./hooks/useTheme";
 
 export default function App() {
-  const [isDark, setIsDark] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const [content, setContent] = useState("");
 
   const [filePath, setFilePath] = useState<string | null>(null);
@@ -33,9 +32,6 @@ export default function App() {
 
   const [mode, setMode] = useState<"view" | "edit">("view");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
-  const charCount = content.length;
 
   const sidebarRef = useRef<PanelImperativeHandle>(null);
   const editorRef = useRef<PanelImperativeHandle>(null);
@@ -74,19 +70,20 @@ export default function App() {
     await saveLastFilePath(path);
   };
 
-  const handleToggleDark = async () => {
-    const theme = !isDark;
-    setIsDark(theme);
-    await saveIsDark(theme);
-  };
+  const { isDark, toggleTheme } = useTheme();
+
+  useKeyboardShortcuts({
+    handleSave,
+    handleOpen,
+    handleToggleMode: () => setMode(mode === "view" ? "edit" : "view"),
+    handleToggleDark: toggleTheme,
+    handleToggleSidebar: () => setIsSidebarOpen(!isSidebarOpen),
+  });
 
   useEffect(() => {
     const loadSettings = async () => {
-      const dark = await getIsDark();
       const lastDir = await getLastDir();
       const lastFile = await getLastFilePath();
-
-      if (dark !== null) setIsDark(dark);
 
       if (lastDir) setCurrentDir(lastDir);
 
@@ -95,47 +92,9 @@ export default function App() {
         setFilePath(lastFile);
         setContent(text);
       }
-
-      setLoaded(true);
     };
     loadSettings();
   }, []);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        switch (e.key) {
-          case "s":
-            e.preventDefault();
-            handleSave();
-            break;
-          case "o":
-            e.preventDefault();
-            handleOpen();
-            break;
-          case "e":
-            e.preventDefault();
-            setMode((prev) => (prev === "view" ? "edit" : "view"));
-            break;
-          case "d":
-            e.preventDefault();
-            setIsDark((prev) => !prev);
-            break;
-          case "b":
-            e.preventDefault();
-            setIsSidebarOpen((prev) => !prev);
-            break;
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [filePath, content]);
 
   useEffect(() => {
     if (isSidebarOpen) sidebarRef.current?.expand();
@@ -154,8 +113,8 @@ export default function App() {
         isDark={isDark}
         onOpen={handleOpen}
         onSave={handleSave}
-        onToggle={() => setMode(mode === "view" ? "edit" : "view")}
-        onToggleDark={handleToggleDark}
+        onToggleView={() => setMode(mode === "view" ? "edit" : "view")}
+        onToggleTheme={toggleTheme}
       />
 
       <div className="flex h-screen">
@@ -212,14 +171,7 @@ export default function App() {
         </Group>
       </div>
 
-      <div className="fixed bottom-0 left-0 flex h-6 w-full items-center justify-end gap-4 bg-white/30 px-4 text-xs text-zinc-500 backdrop-blur-sm dark:bg-zinc-900/30 dark:text-zinc-400">
-        <p>
-          <span className="tabular-nums">{wordCount}</span> words
-        </p>
-        <p>
-          <span className="tabular-nums">{charCount}</span> characters
-        </p>
-      </div>
+      <BottomBar content={content} />
     </div>
   );
 }

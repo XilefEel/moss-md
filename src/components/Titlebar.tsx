@@ -7,15 +7,15 @@ export default function Titlebar({
   mode,
   isDark,
   onOpen,
-  onToggle,
-  onToggleDark,
+  onToggleView,
+  onToggleTheme,
 }: {
   mode: "view" | "edit";
   isDark: boolean;
   onOpen: () => void;
   onSave: () => void;
-  onToggle: () => void;
-  onToggleDark: () => void;
+  onToggleView: () => void;
+  onToggleTheme: () => void;
 }) {
   return (
     <div
@@ -47,7 +47,7 @@ export default function Titlebar({
       </div>
 
       <button
-        onClick={onToggleDark}
+        onClick={onToggleTheme}
         className="ml-auto text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
       >
         {isDark ? (
@@ -58,7 +58,7 @@ export default function Titlebar({
       </button>
 
       <button
-        onClick={onToggle}
+        onClick={onToggleView}
         className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
       >
         {mode === "view" ? (
