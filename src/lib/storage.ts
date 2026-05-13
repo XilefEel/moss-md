@@ -43,3 +43,19 @@ export async function getLastDir(): Promise<string | null> {
 export async function saveLastDir(path: string) {
   return setItem("lastDir", path);
 }
+
+export async function getIsSidebarOpen(): Promise<boolean | null> {
+  return getItem<boolean>("isSidebarOpen");
+}
+
+export async function saveIsSidebarOpen(path: boolean) {
+  return setItem("isSidebarOpen", path);
+}
+
+export async function getViewMode(): Promise<"view" | "edit" | null> {
+  return getItem<"view" | "edit">("viewMode");
+}
+
+export async function saveViewMode(path: string) {
+  return setItem("viewMode", path);
+}

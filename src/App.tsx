@@ -6,15 +6,20 @@ import Viewer from "./components/Viewer";
 import "./App.css";
 import Titlebar from "./components/Titlebar";
 import {
+  getIsSidebarOpen,
   getLastDir,
   getLastFilePath,
+  getViewMode,
+  saveIsSidebarOpen,
   saveLastDir,
   saveLastFilePath,
+  saveViewMode,
 } from "./lib/storage";
 import {
   Group,
   Panel,
   PanelImperativeHandle,
+  PanelSize,
   Separator,
   useDefaultLayout,
 } from "react-resizable-panels";
@@ -30,7 +35,7 @@ export default function App() {
   const [filePath, setFilePath] = useState<string | null>(null);
   const [currentDir, setCurrentDir] = useState<string | null>(null);
 
-  const [mode, setMode] = useState<"view" | "edit">("view");
+  const [mode, setMode] = useState<"view" | "edit">("edit");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const sidebarRef = useRef<PanelImperativeHandle>(null);
@@ -70,6 +75,30 @@ export default function App() {
     await saveLastFilePath(path);
   };
 
+  const handleToggleMode = () => {
+    const next = mode === "view" ? "edit" : "view";
+    setMode(next);
+    saveViewMode(next);
+  };
+
+  const handleToggleSidebar = () => {
+    const next = !isSidebarOpen;
+    setIsSidebarOpen(next);
+    saveIsSidebarOpen(next);
+  };
+
+  const handleSidebarResize = (size: PanelSize) => {
+    const isOpen = size.asPercentage !== 0;
+    setIsSidebarOpen(isOpen);
+    saveIsSidebarOpen(isOpen);
+  };
+
+  const handleEditorResize = (size: PanelSize) => {
+    const isEdit = size.asPercentage !== 0;
+    setMode(isEdit ? "edit" : "view");
+    saveViewMode(isEdit ? "edit" : "view");
+  };
+
   const { isDark, toggleTheme } = useTheme();
 
   useKeyboardShortcuts({
@@ -82,8 +111,12 @@ export default function App() {
 
   useEffect(() => {
     const loadSettings = async () => {
-      const lastDir = await getLastDir();
-      const lastFile = await getLastFilePath();
+      const [lastDir, lastFile, isSidebarOpen, viewMode] = await Promise.all([
+        getLastDir(),
+        getLastFilePath(),
+        getIsSidebarOpen(),
+        getViewMode(),
+      ]);
 
       if (lastDir) setCurrentDir(lastDir);
 
@@ -92,6 +125,9 @@ export default function App() {
         setFilePath(lastFile);
         setContent(text);
       }
+
+      if (isSidebarOpen !== null) setIsSidebarOpen(isSidebarOpen);
+      if (viewMode !== null) setMode(viewMode);
     };
     loadSettings();
   }, []);
@@ -114,8 +150,8 @@ export default function App() {
         isDark={isDark}
         onOpen={handleOpen}
         onSave={handleSave}
-        onToggleMode={() => setMode(mode === "view" ? "edit" : "view")}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        onToggleMode={handleToggleMode}
+        onToggleSidebar={handleToggleSidebar}
         onToggleTheme={toggleTheme}
       />
 
@@ -127,10 +163,7 @@ export default function App() {
             className="pt-12 pb-6"
             panelRef={sidebarRef}
             collapsible
-            onResize={(size) => {
-              if (size.asPercentage === 0) setIsSidebarOpen(false);
-              else setIsSidebarOpen(true);
-            }}
+            onResize={handleSidebarResize}
           >
             <Sidebar
               currentDir={currentDir}
@@ -146,7 +179,7 @@ export default function App() {
             )}
           />
 
-          <Panel className="px-8 pt-12 pb-6" minSize="15%">
+          <Panel id="viewer" className="px-8 pt-12 pb-6" minSize="15%">
             <Viewer content={content} />
           </Panel>
 
@@ -163,10 +196,7 @@ export default function App() {
             className="px-8 pt-12 pb-6"
             panelRef={editorRef}
             collapsible
-            onResize={(size) => {
-              if (size.asPercentage === 0) setMode("view");
-              else setMode("edit");
-            }}
+            onResize={handleEditorResize}
           >
             <Editor content={content} onChange={setContent} isDark={isDark} />
           </Panel>
