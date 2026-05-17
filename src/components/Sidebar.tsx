@@ -19,7 +19,6 @@ const buildTree = async (dirPath: string): Promise<Entry[]> => {
 
       if (entry.isDirectory) {
         const children = await buildTree(entryPath);
-
         if (children.length === 0) return null;
 
         return {
@@ -54,10 +53,12 @@ export default function Sidebar({
   currentDir,
   currentFile,
   onSelect,
+  openFolders,
 }: {
   currentDir: string | null;
   currentFile: string | null;
   onSelect: (path: string) => void;
+  openFolders: Set<string>;
 }) {
   const [entries, setEntries] = useState<Entry[]>([]);
 
@@ -79,6 +80,7 @@ export default function Sidebar({
           entries={entries}
           currentFile={currentFile}
           onSelect={onSelect}
+          openFolders={openFolders}
         />
       ) : (
         <div>No directory selected</div>

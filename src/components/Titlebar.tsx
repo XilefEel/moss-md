@@ -1,10 +1,9 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
-  Eye,
+  FolderOpen,
   Moon,
   PanelLeftOpen,
   PanelRightOpen,
-  Pencil,
   Sun,
 } from "lucide-react";
 
@@ -63,7 +62,7 @@ export default function Titlebar({
           onClick={onOpen}
           className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
         >
-          Open
+          <FolderOpen className="size-4 shrink-0" />
         </button>
       </div>
 
@@ -83,9 +82,9 @@ export default function Titlebar({
         className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
       >
         {mode === "view" ? (
-          <Pencil className="size-4 shrink-0" />
+          <PanelRightOpen className="size-4 shrink-0" />
         ) : (
-          <Eye className="size-4 shrink-0" />
+          <PanelLeftOpen className="size-4 shrink-0" />
         )}
       </button>
     </div>

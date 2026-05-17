@@ -24,7 +24,7 @@ import {
   useDefaultLayout,
 } from "react-resizable-panels";
 import Sidebar from "./components/Sidebar";
-import { cn } from "./lib/utils";
+import { cn, getAncestorPaths } from "./lib/utils";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import BottomBar from "./components/BottomBar";
 import useTheme from "./hooks/useTheme";
@@ -34,6 +34,7 @@ export default function App() {
 
   const [filePath, setFilePath] = useState<string | null>(null);
   const [currentDir, setCurrentDir] = useState<string | null>(null);
+  const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
 
   const [mode, setMode] = useState<"view" | "edit">("edit");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -126,6 +127,11 @@ export default function App() {
         setContent(text);
       }
 
+      if (lastDir && lastFile) {
+        const ancestors = await getAncestorPaths(lastFile, lastDir);
+        setOpenFolders(new Set(ancestors));
+      }
+
       if (isSidebarOpen !== null) setIsSidebarOpen(isSidebarOpen);
       if (viewMode !== null) setMode(viewMode);
     };
@@ -143,7 +149,10 @@ export default function App() {
   }, [mode]);
 
   return (
-    <div className="flex h-screen flex-col bg-white dark:bg-zinc-900">
+    <div
+      className="flex h-screen flex-col bg-white dark:bg-zinc-900"
+      onContextMenu={(e) => e.preventDefault()}
+    >
       <Titlebar
         mode={mode}
         isSidebarOpen={isSidebarOpen}
@@ -169,6 +178,7 @@ export default function App() {
               currentDir={currentDir}
               currentFile={filePath}
               onSelect={handleSelectFile}
+              openFolders={openFolders}
             />
           </Panel>
 

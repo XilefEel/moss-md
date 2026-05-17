@@ -7,13 +7,15 @@ export default function FileTree({
   entries,
   currentFile,
   onSelect,
+  openFolders,
 }: {
   entries: Entry[];
   currentFile: string | null;
   onSelect: (path: string) => void;
+  openFolders: Set<string>;
 }) {
   return (
-    <div>
+    <div className="select-none">
       {entries.map((entry) =>
         entry.isDirectory ? (
           <FolderNode
@@ -21,6 +23,7 @@ export default function FileTree({
             entry={entry}
             currentFile={currentFile}
             onSelect={onSelect}
+            openFolders={openFolders}
           />
         ) : (
           <FileNode
@@ -39,12 +42,14 @@ function FolderNode({
   entry,
   currentFile,
   onSelect,
+  openFolders,
 }: {
   entry: Entry;
   currentFile: string | null;
   onSelect: (path: string) => void;
+  openFolders: Set<string>;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(openFolders.has(entry.path));
 
   return (
     <div className="mb-1">
@@ -70,6 +75,7 @@ function FolderNode({
             entries={entry.children}
             currentFile={currentFile}
             onSelect={onSelect}
+            openFolders={openFolders}
           />
         </div>
       )}
