@@ -31,21 +31,28 @@ import useTheme from "./hooks/useTheme";
 
 export default function App() {
   const [content, setContent] = useState("");
+  const [isDirty, setIsDirty] = useState(false);
 
   const [filePath, setFilePath] = useState<string | null>(null);
   const [currentDir, setCurrentDir] = useState<string | null>(null);
   const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
 
-  const [mode, setMode] = useState<"view" | "edit">("edit");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [mode, setMode] = useState<"view" | "edit" | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean | null>(null);
 
   const sidebarRef = useRef<PanelImperativeHandle>(null);
   const editorRef = useRef<PanelImperativeHandle>(null);
+  const savedContentRef = useRef<string>("");
 
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
     id: "moss-layout",
     storage: localStorage,
   });
+
+  const handleContentChange = (value: string) => {
+    setContent(value);
+    setIsDirty(value !== savedContentRef.current);
+  };
 
   const handleSave = async () => {
     if (!filePath) {
@@ -60,6 +67,9 @@ export default function App() {
     } else {
       await writeTextFile(filePath, content);
     }
+
+    savedContentRef.current = content;
+    setIsDirty(false);
   };
 
   const handleOpen = async () => {
@@ -73,6 +83,7 @@ export default function App() {
     const text = await readTextFile(path);
     setFilePath(path);
     setContent(text);
+    savedContentRef.current = text;
     await saveLastFilePath(path);
   };
 
@@ -105,9 +116,9 @@ export default function App() {
   useKeyboardShortcuts({
     handleSave,
     handleOpen,
-    handleToggleMode: () => setMode(mode === "view" ? "edit" : "view"),
-    handleToggleDark: toggleTheme,
-    handleToggleSidebar: () => setIsSidebarOpen(!isSidebarOpen),
+    toggleTheme,
+    handleToggleMode,
+    handleToggleSidebar,
   });
 
   useEffect(() => {
@@ -125,6 +136,7 @@ export default function App() {
         const text = await readTextFile(lastFile);
         setFilePath(lastFile);
         setContent(text);
+        savedContentRef.current = text;
       }
 
       if (lastDir && lastFile) {
@@ -139,11 +151,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (isSidebarOpen === null) return;
     if (isSidebarOpen) sidebarRef.current?.expand();
     else sidebarRef.current?.collapse();
   }, [isSidebarOpen]);
 
   useEffect(() => {
+    if (mode === null) return;
     if (mode === "edit") editorRef.current?.expand();
     else editorRef.current?.collapse();
   }, [mode]);
@@ -154,9 +168,10 @@ export default function App() {
       onContextMenu={(e) => e.preventDefault()}
     >
       <Titlebar
-        mode={mode}
-        isSidebarOpen={isSidebarOpen}
+        mode={mode!}
+        isSidebarOpen={isSidebarOpen!}
         isDark={isDark}
+        isDirty={isDirty}
         onOpen={handleOpen}
         onSave={handleSave}
         onToggleMode={handleToggleMode}
@@ -208,7 +223,11 @@ export default function App() {
             collapsible
             onResize={handleEditorResize}
           >
-            <Editor content={content} onChange={setContent} isDark={isDark} />
+            <Editor
+              content={content}
+              onChange={handleContentChange}
+              isDark={isDark}
+            />
           </Panel>
         </Group>
       </div>

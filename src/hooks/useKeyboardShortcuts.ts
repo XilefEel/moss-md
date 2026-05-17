@@ -3,14 +3,14 @@ import { useEffect } from "react";
 export function useKeyboardShortcuts({
   handleSave,
   handleOpen,
+  toggleTheme,
   handleToggleMode,
-  handleToggleDark,
   handleToggleSidebar,
 }: {
   handleSave: () => void;
   handleOpen: () => void;
+  toggleTheme: () => void;
   handleToggleMode: () => void;
-  handleToggleDark: () => void;
   handleToggleSidebar: () => void;
 }) {
   useEffect(() => {
@@ -31,7 +31,7 @@ export function useKeyboardShortcuts({
             break;
           case "d":
             e.preventDefault();
-            handleToggleDark();
+            toggleTheme();
             break;
           case "b":
             e.preventDefault();
@@ -47,7 +47,7 @@ export function useKeyboardShortcuts({
     handleSave,
     handleOpen,
     handleToggleMode,
-    handleToggleDark,
+    toggleTheme,
     handleToggleSidebar,
   ]);
 }

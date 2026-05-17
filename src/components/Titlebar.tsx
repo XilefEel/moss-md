@@ -6,6 +6,7 @@ import {
   PanelRightOpen,
   Sun,
 } from "lucide-react";
+import { confirm } from "@tauri-apps/plugin-dialog";
 
 const appWindow = getCurrentWindow();
 
@@ -13,6 +14,7 @@ export default function Titlebar({
   mode,
   isSidebarOpen,
   isDark,
+  isDirty,
   onOpen,
   onToggleMode,
   onToggleSidebar,
@@ -21,12 +23,29 @@ export default function Titlebar({
   mode: "view" | "edit";
   isSidebarOpen: boolean;
   isDark: boolean;
+  isDirty: boolean;
   onOpen: () => void;
   onSave: () => void;
   onToggleMode: () => void;
   onToggleSidebar: () => void;
   onToggleTheme: () => void;
 }) {
+  const handleClose = async () => {
+    if (!isDirty) {
+      appWindow.close();
+      return;
+    }
+
+    const confirmed = await confirm(
+      "You have unsaved changes. Are you sure you want to close?",
+      { title: "Unsaved Changes", kind: "warning" },
+    );
+
+    if (confirmed) {
+      appWindow.close();
+    }
+  };
+
   return (
     <div
       data-tauri-drag-region
@@ -34,7 +53,7 @@ export default function Titlebar({
     >
       <div className="flex flex-row items-center gap-2.5">
         <button
-          onClick={() => appWindow.close()}
+          onClick={handleClose}
           className="size-3.5 rounded-full bg-red-400 transition-colors hover:bg-red-500"
         />
         <button
@@ -65,6 +84,10 @@ export default function Titlebar({
           <FolderOpen className="size-4 shrink-0" />
         </button>
       </div>
+
+      {isDirty && (
+        <div className="size-1.5 rounded-full bg-green-400 dark:bg-green-500" />
+      )}
 
       <button
         onClick={onToggleTheme}
