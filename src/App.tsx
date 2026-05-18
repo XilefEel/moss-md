@@ -63,9 +63,9 @@ export default function App() {
 
       setFilePath(path);
 
-      await writeTextFile(path, content);
+      await writeTextFile(path, content.replace(/\n/g, "\r\n"));
     } else {
-      await writeTextFile(filePath, content);
+      await writeTextFile(filePath, content.replace(/\n/g, "\r\n"));
     }
 
     savedContentRef.current = content;
@@ -82,8 +82,11 @@ export default function App() {
   const handleSelectFile = async (path: string) => {
     const text = await readTextFile(path);
     setFilePath(path);
-    setContent(text);
-    savedContentRef.current = text;
+
+    const normalized = text.replace(/\r\n/g, "\n");
+    setContent(normalized);
+    savedContentRef.current = normalized;
+
     await saveLastFilePath(path);
   };
 
@@ -134,9 +137,10 @@ export default function App() {
 
       if (lastFile) {
         const text = await readTextFile(lastFile);
-        setFilePath(lastFile);
-        setContent(text);
-        savedContentRef.current = text;
+
+        const normalized = text.replace(/\r\n/g, "\n");
+        setContent(normalized);
+        savedContentRef.current = normalized;
       }
 
       if (lastDir && lastFile) {
@@ -145,6 +149,7 @@ export default function App() {
       }
 
       if (isSidebarOpen !== null) setIsSidebarOpen(isSidebarOpen);
+
       if (viewMode !== null) setMode(viewMode);
     };
     loadSettings();
