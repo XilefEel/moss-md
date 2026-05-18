@@ -43,7 +43,7 @@ export default function Sidebar({
           openFolders={openFolders}
         />
       ) : (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-zinc-400 dark:text-zinc-500">
           No directory selected
         </p>
       )}

@@ -6,10 +6,6 @@ import Viewer from "./components/Viewer";
 import "./App.css";
 import Titlebar from "./components/Titlebar";
 import {
-  getIsSidebarOpen,
-  getLastDir,
-  getLastFilePath,
-  getViewMode,
   saveIsSidebarOpen,
   saveLastDir,
   saveLastFilePath,
@@ -24,10 +20,11 @@ import {
   useDefaultLayout,
 } from "react-resizable-panels";
 import Sidebar from "./components/Sidebar";
-import { cn, getAncestorPaths } from "./lib/utils";
+import { cn } from "./lib/utils";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import BottomBar from "./components/BottomBar";
 import useTheme from "./hooks/useTheme";
+import { useRestoreSession } from "./hooks/useRestoreSession";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -122,6 +119,16 @@ export default function App() {
 
   const { isDark, toggleTheme } = useTheme();
 
+  useRestoreSession({
+    setCurrentDir,
+    setFilePath,
+    setContent,
+    savedContentRef,
+    setOpenFolders,
+    setIsSidebarOpen,
+    setMode,
+  });
+
   useKeyboardShortcuts({
     handleSave,
     handleOpen: handleOpenDirectory,
@@ -129,40 +136,6 @@ export default function App() {
     handleToggleMode,
     handleToggleSidebar,
   });
-
-  useEffect(() => {
-    const loadSettings = async () => {
-      const [lastDir, lastFilePath, isSidebarOpen, viewMode] =
-        await Promise.all([
-          getLastDir(),
-          getLastFilePath(),
-          getIsSidebarOpen(),
-          getViewMode(),
-        ]);
-
-      if (lastDir) setCurrentDir(lastDir);
-
-      if (lastFilePath) {
-        const text = await readTextFile(lastFilePath);
-        const normalized = text.replace(/\r\n/g, "\n");
-
-        setFilePath(lastFilePath);
-        setContent(normalized);
-        savedContentRef.current = normalized;
-      }
-
-      if (lastDir && lastFilePath) {
-        const ancestors = await getAncestorPaths(lastFilePath, lastDir);
-        setOpenFolders(new Set(ancestors));
-      }
-
-      if (isSidebarOpen !== null) setIsSidebarOpen(isSidebarOpen);
-
-      if (viewMode !== null) setMode(viewMode);
-    };
-
-    loadSettings();
-  }, []);
 
   useEffect(() => {
     if (isSidebarOpen === null) return;
