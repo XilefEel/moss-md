@@ -72,11 +72,17 @@ export default function App() {
     setIsDirty(false);
   };
 
-  const handleOpen = async () => {
+  const handleOpenDirectory = async () => {
     const dir = await open({ directory: true });
     if (!dir) return;
+
     setCurrentDir(dir);
-    await saveLastDir(dir);
+    setFilePath(null);
+    setContent("");
+    savedContentRef.current = "";
+    setIsDirty(false);
+
+    await Promise.all([saveLastDir(dir), saveLastFilePath("")]);
   };
 
   const handleSelectFile = async (path: string) => {
@@ -118,7 +124,7 @@ export default function App() {
 
   useKeyboardShortcuts({
     handleSave,
-    handleOpen,
+    handleOpen: handleOpenDirectory,
     toggleTheme,
     handleToggleMode,
     handleToggleSidebar,
@@ -126,25 +132,27 @@ export default function App() {
 
   useEffect(() => {
     const loadSettings = async () => {
-      const [lastDir, lastFile, isSidebarOpen, viewMode] = await Promise.all([
-        getLastDir(),
-        getLastFilePath(),
-        getIsSidebarOpen(),
-        getViewMode(),
-      ]);
+      const [lastDir, lastFilePath, isSidebarOpen, viewMode] =
+        await Promise.all([
+          getLastDir(),
+          getLastFilePath(),
+          getIsSidebarOpen(),
+          getViewMode(),
+        ]);
 
       if (lastDir) setCurrentDir(lastDir);
 
-      if (lastFile) {
-        const text = await readTextFile(lastFile);
-
+      if (lastFilePath) {
+        const text = await readTextFile(lastFilePath);
         const normalized = text.replace(/\r\n/g, "\n");
+
+        setFilePath(lastFilePath);
         setContent(normalized);
         savedContentRef.current = normalized;
       }
 
-      if (lastDir && lastFile) {
-        const ancestors = await getAncestorPaths(lastFile, lastDir);
+      if (lastDir && lastFilePath) {
+        const ancestors = await getAncestorPaths(lastFilePath, lastDir);
         setOpenFolders(new Set(ancestors));
       }
 
@@ -152,6 +160,7 @@ export default function App() {
 
       if (viewMode !== null) setMode(viewMode);
     };
+
     loadSettings();
   }, []);
 
@@ -177,7 +186,7 @@ export default function App() {
         isSidebarOpen={isSidebarOpen!}
         isDark={isDark}
         isDirty={isDirty}
-        onOpen={handleOpen}
+        onOpen={handleOpenDirectory}
         onSave={handleSave}
         onToggleMode={handleToggleMode}
         onToggleSidebar={handleToggleSidebar}
