@@ -1,17 +1,17 @@
 import { FileText } from "lucide-react";
-import { Entry } from "./Sidebar";
+
 import { cn } from "../lib/utils";
 import BaseContextMenu from "./BaseContextMenu";
+import { Entry, useCurrentFile } from "../stores/useFileTreeStore";
 
 export default function FileNode({
   entry,
-  currentFile,
   onSelect,
 }: {
   entry: Entry;
-  currentFile: string | null;
   onSelect: (path: string) => void;
 }) {
+  const currentFile = useCurrentFile();
   const isActive = currentFile === entry.path;
 
   return (

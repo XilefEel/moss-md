@@ -25,14 +25,11 @@ import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import BottomBar from "./components/BottomBar";
 import useTheme from "./hooks/useTheme";
 import { useRestoreSession } from "./hooks/useRestoreSession";
+import { useCurrentFile, useFileTreeActions } from "./stores/useFileTreeStore";
 
 export default function App() {
   const [content, setContent] = useState("");
   const [isDirty, setIsDirty] = useState(false);
-
-  const [filePath, setFilePath] = useState<string | null>(null);
-  const [currentDir, setCurrentDir] = useState<string | null>(null);
-  const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
 
   const [mode, setMode] = useState<"view" | "edit" | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean | null>(null);
@@ -40,6 +37,9 @@ export default function App() {
   const sidebarRef = useRef<PanelImperativeHandle>(null);
   const editorRef = useRef<PanelImperativeHandle>(null);
   const savedContentRef = useRef<string>("");
+
+  const currentFilePath = useCurrentFile();
+  const { setCurrentFilePath, setCurrentDir } = useFileTreeActions();
 
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
     id: "moss-layout",
@@ -52,17 +52,16 @@ export default function App() {
   };
 
   const handleSave = async () => {
-    if (!filePath) {
+    if (!currentFilePath) {
       const path = await save({
         filters: [{ name: "Markdown", extensions: ["md"] }],
       });
       if (!path) return;
 
-      setFilePath(path);
-
+      setCurrentFilePath(path);
       await writeTextFile(path, content.replace(/\n/g, "\r\n"));
     } else {
-      await writeTextFile(filePath, content.replace(/\n/g, "\r\n"));
+      await writeTextFile(currentFilePath, content.replace(/\n/g, "\r\n"));
     }
 
     savedContentRef.current = content;
@@ -74,7 +73,7 @@ export default function App() {
     if (!dir) return;
 
     setCurrentDir(dir);
-    setFilePath(null);
+    setCurrentFilePath(null);
     setContent("");
     savedContentRef.current = "";
     setIsDirty(false);
@@ -84,7 +83,7 @@ export default function App() {
 
   const handleSelectFile = async (path: string) => {
     const text = await readTextFile(path);
-    setFilePath(path);
+    setCurrentFilePath(path);
 
     const normalized = text.replace(/\r\n/g, "\n");
     setContent(normalized);
@@ -120,11 +119,8 @@ export default function App() {
   const { isDark, toggleTheme } = useTheme();
 
   useRestoreSession({
-    setCurrentDir,
-    setFilePath,
     setContent,
     savedContentRef,
-    setOpenFolders,
     setIsSidebarOpen,
     setMode,
   });
@@ -176,12 +172,7 @@ export default function App() {
             collapsible
             onResize={handleSidebarResize}
           >
-            <Sidebar
-              currentDir={currentDir}
-              currentFile={filePath}
-              onSelect={handleSelectFile}
-              openFolders={openFolders}
-            />
+            <Sidebar onSelect={handleSelectFile} />
           </Panel>
 
           <Separator

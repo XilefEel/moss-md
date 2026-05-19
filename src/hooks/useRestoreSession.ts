@@ -7,24 +7,22 @@ import {
   getIsSidebarOpen,
   getViewMode,
 } from "../lib/storage";
+import { useFileTreeActions } from "../stores/useFileTreeStore";
 
 export function useRestoreSession({
-  setCurrentDir,
-  setFilePath,
   setContent,
   savedContentRef,
-  setOpenFolders,
   setIsSidebarOpen,
   setMode,
 }: {
-  setCurrentDir: (dir: string) => void;
-  setFilePath: (path: string | null) => void;
   setContent: (content: string) => void;
   savedContentRef: React.RefObject<string>;
-  setOpenFolders: (folders: Set<string>) => void;
   setIsSidebarOpen: (isOpen: boolean) => void;
   setMode: (mode: "edit" | "view") => void;
 }) {
+  const { setCurrentFilePath, setCurrentDir, setOpenFolders } =
+    useFileTreeActions();
+
   useEffect(() => {
     const loadSession = async () => {
       const [lastDir, lastFilePath, isSidebarOpen, viewMode] =
@@ -41,7 +39,7 @@ export function useRestoreSession({
         const text = await readTextFile(lastFilePath);
         const normalized = text.replace(/\r\n/g, "\n");
 
-        setFilePath(lastFilePath);
+        setCurrentFilePath(lastFilePath);
         setContent(normalized);
         savedContentRef.current = normalized;
       }

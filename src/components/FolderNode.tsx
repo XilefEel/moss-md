@@ -2,20 +2,19 @@ import { FolderOpen, FolderIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../lib/utils";
 import FileTree from "./FileTree";
-import { Entry } from "./Sidebar";
+
 import BaseContextMenu from "./BaseContextMenu";
+import { Entry, useOpenFolders } from "../stores/useFileTreeStore";
 
 export default function FolderNode({
   entry,
-  currentFile,
   onSelect,
-  openFolders,
 }: {
   entry: Entry;
-  currentFile: string | null;
   onSelect: (path: string) => void;
-  openFolders: Set<string>;
 }) {
+  const openFolders = useOpenFolders();
+
   const [isOpen, setIsOpen] = useState(openFolders.has(entry.path));
 
   return (
@@ -46,12 +45,7 @@ export default function FolderNode({
 
       {isOpen && entry.children && (
         <div className="pl-5">
-          <FileTree
-            entries={entry.children}
-            currentFile={currentFile}
-            onSelect={onSelect}
-            openFolders={openFolders}
-          />
+          <FileTree entries={entry.children} onSelect={onSelect} />
         </div>
       )}
     </div>

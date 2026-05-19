@@ -1,47 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import FileTree from "./FileTree";
-import { buildTree } from "../lib/utils";
-
-export type Entry = {
-  name: string;
-  path: string;
-  isDirectory: boolean;
-  children: Entry[] | null;
-};
+import {
+  useCurrentDir,
+  useEntries,
+  useFileTreeActions,
+} from "../stores/useFileTreeStore";
 
 export default function Sidebar({
-  currentDir,
-  currentFile,
   onSelect,
-  openFolders,
 }: {
-  currentDir: string | null;
-  currentFile: string | null;
   onSelect: (path: string) => void;
-  openFolders: Set<string>;
 }) {
-  const [entries, setEntries] = useState<Entry[]>([]);
+  const entries = useEntries();
+  const currentDir = useCurrentDir();
+
+  const { refreshTree } = useFileTreeActions();
 
   useEffect(() => {
-    if (!currentDir) return;
-
-    const fetchEntries = async () => {
-      const entries = await buildTree(currentDir);
-      setEntries(entries);
-    };
-
-    fetchEntries();
+    refreshTree();
   }, [currentDir]);
 
   return (
     <div className="h-full overflow-auto px-8">
       {currentDir ? (
-        <FileTree
-          entries={entries}
-          currentFile={currentFile}
-          onSelect={onSelect}
-          openFolders={openFolders}
-        />
+        <FileTree entries={entries} onSelect={onSelect} />
       ) : (
         <p className="text-sm text-zinc-400 dark:text-zinc-500">
           No directory selected
