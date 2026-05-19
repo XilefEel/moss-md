@@ -1,4 +1,4 @@
-import { Entry } from "../stores/useFileTreeStore";
+import { Entry } from "../../stores/useFileTreeStore";
 import FileNode from "./FileNode";
 import FolderNode from "./FolderNode";
 

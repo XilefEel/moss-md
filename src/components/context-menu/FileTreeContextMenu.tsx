@@ -1,13 +1,13 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
-import { cn } from "../lib/utils";
+import { cn } from "../../lib/utils";
 import { FilePlus, FolderPlus, PencilLine, Trash2 } from "lucide-react";
 import ContextMenuItem from "./ContextMenuItem";
-import { Entry, useFileTreeActions } from "../stores/useFileTreeStore";
-import { createFile, createFolder, deleteEntry } from "../lib/io";
+import { Entry, useFileTreeActions } from "../../stores/useFileTreeStore";
+import { createFile, createFolder, deleteEntry } from "../../lib/io";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { dirname } from "@tauri-apps/api/path";
 
-export default function BaseContextMenu({
+export default function FileTreeContextMenu({
   children,
   entry,
   onSelect,

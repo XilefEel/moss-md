@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import FileTree from "./FileTree";
+import FileTree from "../sidebar/FileTree";
 import {
   useCurrentDir,
   useEntries,
   useFileTreeActions,
-} from "../stores/useFileTreeStore";
+} from "../../stores/useFileTreeStore";
 
 export default function Sidebar({
   onSelect,

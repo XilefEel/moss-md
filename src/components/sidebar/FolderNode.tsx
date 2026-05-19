@@ -1,14 +1,14 @@
 import { FolderOpen, FolderIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { cn } from "../lib/utils";
+import { cn } from "../../lib/utils";
 import FileTree from "./FileTree";
-import EntryContextMenu from "./EntryContextMenu";
+import { renameEntry } from "../../lib/io";
 import {
   Entry,
-  useFileTreeActions,
   useOpenFolders,
-} from "../stores/useFileTreeStore";
-import { renameEntry } from "../lib/io";
+  useFileTreeActions,
+} from "../../stores/useFileTreeStore";
+import FileTreeContextMenu from "../context-menu/FileTreeContextMenu";
 
 export default function FolderNode({
   entry,
@@ -52,7 +52,7 @@ export default function FolderNode({
   }, [isRenaming]);
 
   return (
-    <EntryContextMenu
+    <FileTreeContextMenu
       entry={entry}
       onSelect={onSelect}
       onRename={() => setIsRenaming(true)}
@@ -104,6 +104,6 @@ export default function FolderNode({
           </div>
         )}
       </div>
-    </EntryContextMenu>
+    </FileTreeContextMenu>
   );
 }

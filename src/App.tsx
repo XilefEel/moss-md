@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
-import Editor from "./components/Editor";
-import Viewer from "./components/Viewer";
+import Editor from "./components/panels/Editor";
+import Viewer from "./components/panels/Viewer";
 import "./App.css";
 import Titlebar from "./components/Titlebar";
 import {
@@ -19,7 +19,7 @@ import {
   Separator,
   useDefaultLayout,
 } from "react-resizable-panels";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/sidebar/Sidebar";
 import { cn } from "./lib/utils";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import BottomBar from "./components/BottomBar";

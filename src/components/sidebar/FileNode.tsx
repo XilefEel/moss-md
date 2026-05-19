@@ -1,13 +1,13 @@
 import { FileText } from "lucide-react";
-import { cn } from "../lib/utils";
-import EntryContextMenu from "./EntryContextMenu";
+import { useState, useRef, useEffect } from "react";
+import { renameEntry } from "../../lib/io";
+import { cn } from "../../lib/utils";
 import {
   Entry,
   useCurrentFile,
   useFileTreeActions,
-} from "../stores/useFileTreeStore";
-import { useEffect, useRef, useState } from "react";
-import { renameEntry } from "../lib/io";
+} from "../../stores/useFileTreeStore";
+import FileTreeContextMenu from "../context-menu/FileTreeContextMenu";
 
 export default function FileNode({
   entry,
@@ -52,14 +52,16 @@ export default function FileNode({
   }, [isRenaming]);
 
   return (
-    <EntryContextMenu
+    <FileTreeContextMenu
       entry={entry}
       onSelect={onSelect}
       onRename={() => setIsRenaming(true)}
       isDirectory={false}
     >
       <button
-        onClick={() => onSelect(entry.path)}
+        onClick={() => {
+          if (!isRenaming || isActive) onSelect(entry.path);
+        }}
         className={cn(
           "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5",
           "truncate text-sm text-zinc-800 dark:text-zinc-200",
@@ -94,6 +96,6 @@ export default function FileNode({
           />
         </div>
       </button>
-    </EntryContextMenu>
+    </FileTreeContextMenu>
   );
 }

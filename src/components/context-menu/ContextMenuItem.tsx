@@ -1,5 +1,5 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
-import { cn } from "../lib/utils";
+import { cn } from "../../lib/utils";
 import { LucideIcon } from "lucide-react";
 
 export default function ContextMenuItem({
