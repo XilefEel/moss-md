@@ -3,7 +3,7 @@ import { cn } from "../lib/utils";
 import { FilePlus, FolderPlus, PencilLine, Trash2 } from "lucide-react";
 import ContextMenuItem from "./ContextMenuItem";
 import { Entry, useFileTreeActions } from "../stores/useFileTreeStore";
-import { createFile, createFolder, renameEntry, deleteEntry } from "../lib/io";
+import { createFile, createFolder, deleteEntry } from "../lib/io";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { dirname } from "@tauri-apps/api/path";
 
@@ -11,11 +11,13 @@ export default function BaseContextMenu({
   children,
   entry,
   onSelect,
+  onRename,
   isDirectory,
 }: {
   children: React.ReactNode;
   entry: Entry;
   onSelect: (path: string) => void;
+  onRename: () => void;
   isDirectory?: boolean;
 }) {
   const { refreshTree, setCurrentFilePath } = useFileTreeActions();
@@ -40,14 +42,6 @@ export default function BaseContextMenu({
     const folderPath = await createFolder(targetDir, name);
 
     setCurrentFilePath(folderPath);
-    refreshTree();
-  };
-
-  const handleRename = async () => {
-    const newName = prompt("New name:", entry.name);
-    if (!newName || newName === entry.name) return;
-
-    await renameEntry(entry.path, newName);
     refreshTree();
   };
 
@@ -89,10 +83,10 @@ export default function BaseContextMenu({
             label="New Folder"
           />
 
-          <ContextMenu.Separator className="my-1 h-px bg-zinc-200 dark:bg-zinc-700" />
+          <ContextMenu.Separator className="my-1 h-px border-t border-t-zinc-200 dark:border-t-zinc-700" />
 
           <ContextMenuItem
-            onSelect={handleRename}
+            onSelect={onRename}
             Icon={PencilLine}
             label={`Rename ${isDirectory ? "Folder" : "File"}`}
           />

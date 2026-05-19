@@ -3,15 +3,15 @@ import { cn } from "../lib/utils";
 import { LucideIcon } from "lucide-react";
 
 export default function ContextMenuItem({
-  onSelect,
-  isDelete,
   Icon,
   label,
+  onSelect,
+  isDelete,
 }: {
-  onSelect?: () => void;
-  isDelete?: boolean;
   Icon: LucideIcon;
   label: string;
+  onSelect?: () => void;
+  isDelete?: boolean;
 }) {
   return (
     <ContextMenu.Item

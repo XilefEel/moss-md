@@ -1,7 +1,13 @@
 import { FileText } from "lucide-react";
 import { cn } from "../lib/utils";
 import EntryContextMenu from "./EntryContextMenu";
-import { Entry, useCurrentFile } from "../stores/useFileTreeStore";
+import {
+  Entry,
+  useCurrentFile,
+  useFileTreeActions,
+} from "../stores/useFileTreeStore";
+import { useEffect, useRef, useState } from "react";
+import { renameEntry } from "../lib/io";
 
 export default function FileNode({
   entry,
@@ -11,10 +17,47 @@ export default function FileNode({
   onSelect: (path: string) => void;
 }) {
   const currentFile = useCurrentFile();
+  const { refreshTree } = useFileTreeActions();
+
+  const [name, setName] = useState(entry.name.replace(/\.md$/, ""));
+  const [isRenaming, setIsRenaming] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const isActive = currentFile === entry.path;
 
+  const handleBlur = async () => {
+    if (name && name !== entry.name.replace(/\.md$/, "")) {
+      await renameEntry(entry.path, `${name}.md`);
+      refreshTree();
+    }
+
+    setIsRenaming(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") inputRef.current?.blur();
+    if (e.key === "Escape") {
+      setName(entry.name.replace(/\.md$/, ""));
+      setIsRenaming(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isRenaming && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }, 1);
+    }
+  }, [isRenaming]);
+
   return (
-    <EntryContextMenu entry={entry} onSelect={onSelect} isDirectory={false}>
+    <EntryContextMenu
+      entry={entry}
+      onSelect={onSelect}
+      onRename={() => setIsRenaming(true)}
+      isDirectory={false}
+    >
       <button
         onClick={() => onSelect(entry.path)}
         className={cn(
@@ -26,7 +69,30 @@ export default function FileNode({
         )}
       >
         <FileText className="size-4 shrink-0" />
-        {entry.name.replace(/\.md$/, "")}
+
+        <div
+          className={cn(
+            "min-w-0 flex-1 rounded text-left",
+            isRenaming &&
+              "bg-zinc-50 px-1 text-zinc-800 shadow-md ring-2 ring-emerald-500 dark:bg-zinc-800 dark:text-zinc-200",
+          )}
+        >
+          <input
+            ref={inputRef}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            readOnly={!isRenaming}
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            className={cn(
+              "w-full truncate bg-transparent focus:outline-none",
+              !isRenaming && "pointer-events-none",
+            )}
+          />
+        </div>
       </button>
     </EntryContextMenu>
   );
