@@ -25,7 +25,10 @@ import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import BottomBar from "./components/BottomBar";
 import useTheme from "./hooks/useTheme";
 import { useRestoreSession } from "./hooks/useRestoreSession";
-import { useCurrentFile, useFileTreeActions } from "./stores/useFileTreeStore";
+import {
+  useCurrentFilePath,
+  useFileTreeActions,
+} from "./stores/useFileTreeStore";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -38,7 +41,7 @@ export default function App() {
   const editorRef = useRef<PanelImperativeHandle>(null);
   const savedContentRef = useRef<string>("");
 
-  const currentFilePath = useCurrentFile();
+  const currentFilePath = useCurrentFilePath();
   const { setCurrentFilePath, setCurrentDir } = useFileTreeActions();
 
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
@@ -172,7 +175,7 @@ export default function App() {
             collapsible
             onResize={handleSidebarResize}
           >
-            <Sidebar onSelect={handleSelectFile} />
+            <Sidebar onSelectFile={handleSelectFile} />
           </Panel>
 
           <Separator

@@ -1,13 +1,7 @@
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { buildTree } from "../lib/utils";
-
-export type Entry = {
-  name: string;
-  path: string;
-  isDirectory: boolean;
-  children: Entry[] | null;
-};
+import { Entry } from "../lib/types";
 
 type FileTreeStore = {
   entries: Entry[];
@@ -45,7 +39,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
 
 export const useEntries = () => useFileTreeStore((state) => state.entries);
 
-export const useCurrentFile = () =>
+export const useCurrentFilePath = () =>
   useFileTreeStore((state) => state.currentFilePath);
 
 export const useCurrentDir = () =>

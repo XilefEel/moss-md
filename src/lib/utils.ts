@@ -2,7 +2,7 @@ import { dirname, join } from "@tauri-apps/api/path";
 import { readDir } from "@tauri-apps/plugin-fs";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Entry } from "../stores/useFileTreeStore";
+import { Entry } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

@@ -2,21 +2,22 @@ import * as ContextMenu from "@radix-ui/react-context-menu";
 import { cn } from "../../lib/utils";
 import { FilePlus, FolderPlus, PencilLine, Trash2 } from "lucide-react";
 import ContextMenuItem from "./ContextMenuItem";
-import { Entry, useFileTreeActions } from "../../stores/useFileTreeStore";
+import { useFileTreeActions } from "../../stores/useFileTreeStore";
 import { createFile, createFolder, deleteEntry } from "../../lib/io";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { dirname } from "@tauri-apps/api/path";
+import { Entry } from "../../lib/types";
 
 export default function FileTreeContextMenu({
   children,
   entry,
-  onSelect,
+  onSelectFile,
   onRename,
   isDirectory,
 }: {
   children: React.ReactNode;
   entry: Entry;
-  onSelect: (path: string) => void;
+  onSelectFile: (path: string) => void;
   onRename: () => void;
   isDirectory?: boolean;
 }) {
@@ -30,7 +31,7 @@ export default function FileTreeContextMenu({
     const filePath = await createFile(targetDir, name);
 
     setCurrentFilePath(filePath);
-    onSelect(filePath);
+    onSelectFile(filePath);
     refreshTree();
   };
 

@@ -1,66 +1,68 @@
 import { FileText } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { renameEntry } from "../../lib/io";
 import { cn } from "../../lib/utils";
 import {
-  Entry,
-  useCurrentFile,
+  useCurrentFilePath,
   useFileTreeActions,
 } from "../../stores/useFileTreeStore";
 import FileTreeContextMenu from "../context-menu/FileTreeContextMenu";
+import { Entry } from "../../lib/types";
+import { saveLastFilePath } from "../../lib/storage";
+import { useInlineEdit } from "../../hooks/useInlineEdit";
 
 export default function FileNode({
   entry,
-  onSelect,
+  onSelectFile,
 }: {
   entry: Entry;
-  onSelect: (path: string) => void;
+  onSelectFile: (path: string) => void;
 }) {
-  const currentFile = useCurrentFile();
-  const { refreshTree } = useFileTreeActions();
+  const currentFile = useCurrentFilePath();
+  const { refreshTree, setCurrentFilePath } = useFileTreeActions();
 
-  const [name, setName] = useState(entry.name.replace(/\.md$/, ""));
-  const [isRenaming, setIsRenaming] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
   const isActive = currentFile === entry.path;
 
-  const handleBlur = async () => {
-    if (name && name !== entry.name.replace(/\.md$/, "")) {
-      await renameEntry(entry.path, `${name}.md`);
+  const {
+    value: name,
+    setValue: setName,
+    isEditing,
+    setIsEditing,
+    handleBlur,
+    handleKeyDown,
+  } = useInlineEdit({
+    initialValue: entry.name.replace(/\.md$/, ""),
+    onSave: async (newName) => {
+      const newPath = await renameEntry(entry.path, `${newName}.md`);
       refreshTree();
-    }
 
-    setIsRenaming(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") inputRef.current?.blur();
-    if (e.key === "Escape") {
-      setName(entry.name.replace(/\.md$/, ""));
-      setIsRenaming(false);
-    }
-  };
+      if (isActive) {
+        setCurrentFilePath(newPath);
+        await saveLastFilePath(newPath);
+      }
+    },
+  });
 
   useEffect(() => {
-    if (isRenaming && inputRef.current) {
+    if (isEditing && inputRef.current) {
       setTimeout(() => {
         inputRef.current?.focus();
         inputRef.current?.select();
       }, 1);
     }
-  }, [isRenaming]);
+  }, [isEditing]);
 
   return (
     <FileTreeContextMenu
       entry={entry}
-      onSelect={onSelect}
-      onRename={() => setIsRenaming(true)}
+      onSelectFile={onSelectFile}
+      onRename={() => setIsEditing(true)}
       isDirectory={false}
     >
       <button
         onClick={() => {
-          if (!isRenaming || isActive) onSelect(entry.path);
+          if (!isEditing || isActive) onSelectFile(entry.path);
         }}
         className={cn(
           "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5",
@@ -75,7 +77,7 @@ export default function FileNode({
         <div
           className={cn(
             "min-w-0 flex-1 rounded text-left",
-            isRenaming &&
+            isEditing &&
               "bg-zinc-50 px-1 text-zinc-800 shadow-md ring-2 ring-emerald-500 dark:bg-zinc-800 dark:text-zinc-200",
           )}
         >
@@ -85,13 +87,13 @@ export default function FileNode({
             onChange={(e) => setName(e.target.value)}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            readOnly={!isRenaming}
+            readOnly={!isEditing}
             autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
             className={cn(
               "w-full truncate bg-transparent focus:outline-none",
-              !isRenaming && "pointer-events-none",
+              !isEditing && "pointer-events-none",
             )}
           />
         </div>
