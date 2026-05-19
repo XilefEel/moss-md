@@ -2,7 +2,7 @@ import { dirname, join } from "@tauri-apps/api/path";
 import { readDir } from "@tauri-apps/plugin-fs";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Entry } from "../components/Sidebar";
+import { Entry } from "../stores/useFileTreeStore";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -17,7 +17,6 @@ export const buildTree = async (dirPath: string): Promise<Entry[]> => {
 
       if (entry.isDirectory) {
         const children = await buildTree(entryPath);
-        if (children.length === 0) return null;
 
         return {
           name: entry.name,

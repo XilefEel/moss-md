@@ -1,7 +1,6 @@
 import { FileText } from "lucide-react";
-
 import { cn } from "../lib/utils";
-import BaseContextMenu from "./BaseContextMenu";
+import EntryContextMenu from "./EntryContextMenu";
 import { Entry, useCurrentFile } from "../stores/useFileTreeStore";
 
 export default function FileNode({
@@ -15,12 +14,7 @@ export default function FileNode({
   const isActive = currentFile === entry.path;
 
   return (
-    <BaseContextMenu
-      onNewFile={() => console.log("New File", entry.path)}
-      onRename={() => console.log("Rename", entry.path)}
-      onDelete={() => console.log("Delete", entry.path)}
-      isDirectory={false}
-    >
+    <EntryContextMenu entry={entry} onSelect={onSelect} isDirectory={false}>
       <button
         onClick={() => onSelect(entry.path)}
         className={cn(
@@ -34,6 +28,6 @@ export default function FileNode({
         <FileText className="size-4 shrink-0" />
         {entry.name.replace(/\.md$/, "")}
       </button>
-    </BaseContextMenu>
+    </EntryContextMenu>
   );
 }

@@ -2,8 +2,7 @@ import { FolderOpen, FolderIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../lib/utils";
 import FileTree from "./FileTree";
-
-import BaseContextMenu from "./BaseContextMenu";
+import EntryContextMenu from "./EntryContextMenu";
 import { Entry, useOpenFolders } from "../stores/useFileTreeStore";
 
 export default function FolderNode({
@@ -18,14 +17,8 @@ export default function FolderNode({
   const [isOpen, setIsOpen] = useState(openFolders.has(entry.path));
 
   return (
-    <div className="mb-1">
-      <BaseContextMenu
-        onNewFile={() => console.log("New File", entry.path)}
-        onNewFolder={() => console.log("New Folder", entry.path)}
-        onRename={() => console.log("Rename", entry.path)}
-        onDelete={() => console.log("Delete", entry.path)}
-        isDirectory
-      >
+    <EntryContextMenu entry={entry} onSelect={onSelect} isDirectory>
+      <div className="mb-1">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
@@ -39,15 +32,15 @@ export default function FolderNode({
           ) : (
             <FolderIcon className="size-4 shrink-0" />
           )}
-          {entry.name}
+          <span>{entry.name}</span>
         </button>
-      </BaseContextMenu>
 
-      {isOpen && entry.children && (
-        <div className="pl-5">
-          <FileTree entries={entry.children} onSelect={onSelect} />
-        </div>
-      )}
-    </div>
+        {isOpen && entry.children && (
+          <div className="pl-5">
+            <FileTree entries={entry.children} onSelect={onSelect} />
+          </div>
+        )}
+      </div>
+    </EntryContextMenu>
   );
 }
