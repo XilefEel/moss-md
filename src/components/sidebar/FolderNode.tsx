@@ -7,11 +7,13 @@ import {
   useOpenFolders,
   useFileTreeActions,
   useCurrentFilePath,
+  useNewEntry,
 } from "../../stores/useFileTreeStore";
 import FileTreeContextMenu from "../context-menu/FileTreeContextMenu";
 import { Entry } from "../../lib/types";
 import { saveLastFilePath } from "../../lib/storage";
 import { useInlineEdit } from "../../hooks/useInlineEdit";
+import { NewEntryInput } from "./NewEntryInput";
 
 export default function FolderNode({
   entry,
@@ -21,8 +23,9 @@ export default function FolderNode({
   onSelectFile: (path: string) => void;
 }) {
   const openFolders = useOpenFolders();
-  const { refreshTree, setCurrentFilePath } = useFileTreeActions();
+  const newEntry = useNewEntry();
   const currentFilePath = useCurrentFilePath();
+  const { refreshTree, setCurrentFilePath } = useFileTreeActions();
 
   const [isOpen, setIsOpen] = useState(openFolders.has(entry.path));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +63,6 @@ export default function FolderNode({
   return (
     <FileTreeContextMenu
       entry={entry}
-      onSelectFile={onSelectFile}
       onRename={() => setIsEditing(true)}
       isDirectory
     >
@@ -108,6 +110,10 @@ export default function FolderNode({
 
         {isOpen && entry.children && (
           <div className="pl-5">
+            {newEntry?.dirPath === entry.path && (
+              <NewEntryInput type={newEntry.type} onSelectFile={onSelectFile} />
+            )}
+
             <FileTree entries={entry.children} onSelectFile={onSelectFile} />
           </div>
         )}
