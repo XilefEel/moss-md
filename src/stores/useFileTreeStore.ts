@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
-import { buildTree } from "../lib/utils";
 import { Entry } from "../lib/types";
 import * as io from "../lib/io";
 
@@ -143,7 +142,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
     const currentDir = get().currentDir;
     if (!currentDir) return;
 
-    const tree = await buildTree(currentDir);
+    const tree = await io.buildTree(currentDir);
     set({ entries: tree });
   },
 }));

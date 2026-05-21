@@ -1,11 +1,13 @@
+import { invoke } from "@tauri-apps/api/core";
 import { dirname, join } from "@tauri-apps/api/path";
 import { create, mkdir, remove, rename } from "@tauri-apps/plugin-fs";
+import { Entry } from "./types";
 
 export const createFile = async (
   dirPath: string,
   name: string,
 ): Promise<string> => {
-  const fileName = name.endsWith("md") ? name : `${name}.md`;
+  const fileName = name.endsWith(".md") ? name : `${name}.md`;
   const filePath = await join(dirPath, fileName);
 
   await create(filePath);
@@ -38,4 +40,8 @@ export async function deleteEntry(
   isDirectory: boolean,
 ): Promise<void> {
   await remove(path, { recursive: isDirectory });
+}
+
+export async function buildTree(dirPath: string) {
+  return await invoke<Entry[]>("build_tree", { dirPath });
 }
