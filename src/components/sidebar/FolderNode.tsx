@@ -2,7 +2,6 @@ import { FolderOpen, FolderIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../../lib/utils";
 import FileTree from "./FileTree";
-import { renameEntry } from "../../lib/io";
 import {
   useOpenFolders,
   useFileTreeActions,
@@ -25,7 +24,7 @@ export default function FolderNode({
   const openFolders = useOpenFolders();
   const newEntry = useNewEntry();
   const currentFilePath = useCurrentFilePath();
-  const { refreshTree, setCurrentFilePath } = useFileTreeActions();
+  const { setCurrentFilePath, renameEntry } = useFileTreeActions();
 
   const [isOpen, setIsOpen] = useState(openFolders.has(entry.path));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,7 +40,6 @@ export default function FolderNode({
     initialValue: entry.name,
     onSave: async (newName) => {
       const newPath = await renameEntry(entry.path, newName);
-      refreshTree();
 
       if (currentFilePath?.startsWith(entry.path)) {
         const updatedPath = currentFilePath.replace(entry.path, newPath);

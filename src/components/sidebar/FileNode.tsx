@@ -1,6 +1,5 @@
 import { FileText } from "lucide-react";
 import { useRef, useEffect } from "react";
-import { renameEntry } from "../../lib/io";
 import { cn } from "../../lib/utils";
 import {
   useCurrentFilePath,
@@ -19,7 +18,7 @@ export default function FileNode({
   onSelectFile: (path: string) => void;
 }) {
   const currentFile = useCurrentFilePath();
-  const { refreshTree, setCurrentFilePath } = useFileTreeActions();
+  const { setCurrentFilePath, renameEntry } = useFileTreeActions();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const isActive = currentFile === entry.path;
@@ -35,7 +34,6 @@ export default function FileNode({
     initialValue: entry.name.replace(/\.md$/, ""),
     onSave: async (newName) => {
       const newPath = await renameEntry(entry.path, `${newName}.md`);
-      refreshTree();
 
       if (isActive) {
         setCurrentFilePath(newPath);
@@ -56,7 +54,6 @@ export default function FileNode({
   return (
     <FileTreeContextMenu
       entry={entry}
-      onSelectFile={onSelectFile}
       onRename={() => setIsEditing(true)}
       isDirectory={false}
     >

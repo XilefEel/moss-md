@@ -1,7 +1,6 @@
 import { FileText, FolderIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFileTreeActions, useNewEntry } from "../../stores/useFileTreeStore";
-import { createFile, createFolder } from "../../lib/io";
 
 export function NewEntryInput({
   type,
@@ -12,7 +11,7 @@ export function NewEntryInput({
 }) {
   const [name, setName] = useState("");
   const newEntry = useNewEntry();
-  const { setNewEntry, refreshTree } = useFileTreeActions();
+  const { setNewEntry, createFile, createFolder } = useFileTreeActions();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleConfirm = async () => {
@@ -25,7 +24,6 @@ export function NewEntryInput({
       await createFolder(newEntry.dirPath, name);
     }
 
-    refreshTree();
     setNewEntry(null);
   };
 

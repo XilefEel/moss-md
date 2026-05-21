@@ -3,7 +3,6 @@ import { cn } from "../../lib/utils";
 import { FilePlus, FolderPlus, PencilLine, Trash2 } from "lucide-react";
 import ContextMenuItem from "./ContextMenuItem";
 import { useFileTreeActions } from "../../stores/useFileTreeStore";
-import { deleteEntry } from "../../lib/io";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { dirname } from "@tauri-apps/api/path";
 import { Entry } from "../../lib/types";
@@ -19,7 +18,8 @@ export default function FileTreeContextMenu({
   onRename: () => void;
   isDirectory?: boolean;
 }) {
-  const { refreshTree, setCurrentFilePath, setNewEntry } = useFileTreeActions();
+  const { refreshTree, setCurrentFilePath, setNewEntry, deleteEntry } =
+    useFileTreeActions();
 
   const handleNewEntry = async (type: "file" | "folder") => {
     const targetDir = isDirectory ? entry.path : await dirname(entry.path);
