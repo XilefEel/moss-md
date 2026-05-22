@@ -3,17 +3,32 @@ import { useShallow } from "zustand/react/shallow";
 import { Entry } from "../lib/types";
 import * as io from "../lib/io";
 
+const sortEntries = (entries: Entry[]): Entry[] => {
+  return [...entries].sort((a, b) => {
+    if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+  });
+};
+
 const insertIntoTree = (
   entries: Entry[],
+  rootDir: string,
   dirPath: string,
   newEntry: Entry,
 ): Entry[] => {
+  if (dirPath === rootDir) {
+    return sortEntries([...entries, newEntry]);
+  }
+
   return entries.map((e) => {
     if (e.path === dirPath) {
-      return { ...e, children: [...(e.children ?? []), newEntry] };
+      return { ...e, children: sortEntries([...(e.children ?? []), newEntry]) };
     }
     if (e.isDirectory && dirPath.startsWith(e.path) && e.children) {
-      return { ...e, children: insertIntoTree(e.children, dirPath, newEntry) };
+      return {
+        ...e,
+        children: insertIntoTree(e.children, rootDir, dirPath, newEntry),
+      };
     }
     return e;
   });
@@ -32,7 +47,9 @@ const renameInTree = (
     if (e.isDirectory && oldPath.startsWith(e.path) && e.children) {
       return {
         ...e,
-        children: renameInTree(e.children, oldPath, newPath, newName),
+        children: sortEntries(
+          renameInTree(e.children, oldPath, newPath, newName),
+        ),
       };
     }
     return e;
@@ -43,7 +60,9 @@ const removeFromTree = (entries: Entry[], path: string): Entry[] => {
   return entries
     .filter((e) => e.path !== path)
     .map((e) =>
-      e.children ? { ...e, children: removeFromTree(e.children, path) } : e,
+      e.isDirectory && path.startsWith(e.path) && e.children
+        ? { ...e, children: removeFromTree(e.children, path) }
+        : e,
     );
 };
 
@@ -94,7 +113,12 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
     };
 
     set((state) => ({
-      entries: insertIntoTree(state.entries, dirPath, newFile),
+      entries: insertIntoTree(
+        state.entries,
+        state.currentDir!,
+        dirPath,
+        newFile,
+      ),
     }));
 
     return filePath;
@@ -111,16 +135,24 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
     };
 
     set((state) => ({
-      entries: insertIntoTree(state.entries, dirPath, newFolder),
+      entries: insertIntoTree(
+        state.entries,
+        state.currentDir!,
+        dirPath,
+        newFolder,
+      ),
     }));
 
     return folderPath;
   },
+
   renameEntry: async (oldPath, newName) => {
     const newPath = await io.renameEntry(oldPath, newName);
 
     set((state) => ({
-      entries: renameInTree(get().entries, oldPath, newPath, newName),
+      entries: sortEntries(
+        renameInTree(state.entries, oldPath, newPath, newName),
+      ),
       currentFilePath:
         state.currentFilePath === oldPath ? newPath : state.currentFilePath,
     }));
