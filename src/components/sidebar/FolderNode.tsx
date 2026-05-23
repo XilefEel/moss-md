@@ -26,7 +26,7 @@ export default function FolderNode({
   const currentFilePath = useCurrentFilePath();
   const { setCurrentFilePath, renameEntry } = useFileTreeActions();
 
-  const [isOpen, setIsOpen] = useState(openFolders.has(entry.path));
+  const [isOpen, setIsOpen] = useState(() => openFolders.has(entry.path));
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -50,12 +50,14 @@ export default function FolderNode({
   });
 
   useEffect(() => {
-    if (isEditing && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 1);
-    }
+    if (!isEditing || !inputRef.current) return;
+
+    const id = setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 1);
+
+    return () => clearTimeout(id);
   }, [isEditing]);
 
   return (

@@ -11,8 +11,7 @@ function getStore() {
 
 export async function setItem<T>(key: string, value: T) {
   const store = await getStore();
-  await store.set(key, value);
-  await store.save();
+  await Promise.all([store.set(key, value), store.save()]);
 }
 
 export async function getItem<T>(key: string): Promise<T | null> {

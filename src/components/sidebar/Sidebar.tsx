@@ -22,7 +22,7 @@ export default function Sidebar({
 
   useEffect(() => {
     refreshTree();
-  }, [currentDir]);
+  }, [currentDir, refreshTree]);
 
   return (
     <SidebarContextMenu>

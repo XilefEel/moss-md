@@ -27,6 +27,10 @@ fn read_dir(dir: &Path) -> std::io::Result<Vec<Entry>> {
         let path_str = path.to_string_lossy().into_owned();
         let is_dir = path.is_dir();
 
+        if name.starts_with('.') {
+            continue;
+        }
+
         if !is_dir && path.extension().and_then(|e| e.to_str()) != Some("md") {
             continue;
         }

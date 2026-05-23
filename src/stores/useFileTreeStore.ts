@@ -4,7 +4,7 @@ import { Entry } from "../lib/types";
 import * as io from "../lib/io";
 
 const sortEntries = (entries: Entry[]): Entry[] => {
-  return [...entries].sort((a, b) => {
+  return entries.toSorted((a, b) => {
     if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
     return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
   });
@@ -57,13 +57,19 @@ const renameInTree = (
 };
 
 const removeFromTree = (entries: Entry[], path: string): Entry[] => {
-  return entries
-    .filter((e) => e.path !== path)
-    .map((e) =>
+  const result: Entry[] = [];
+
+  for (const e of entries) {
+    if (e.path === path) continue;
+
+    result.push(
       e.isDirectory && path.startsWith(e.path) && e.children
         ? { ...e, children: removeFromTree(e.children, path) }
         : e,
     );
+  }
+
+  return result;
 };
 
 type FileTreeStore = {

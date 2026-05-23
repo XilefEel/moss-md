@@ -35,12 +35,14 @@ export function NewEntryInput({
   };
 
   useEffect(() => {
-    if (inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 1);
-    }
+    if (!inputRef.current) return;
+
+    const id = setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 1);
+
+    return () => clearTimeout(id);
   }, []);
 
   return (

@@ -43,12 +43,14 @@ export default function FileNode({
   });
 
   useEffect(() => {
-    if (isEditing && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 1);
-    }
+    if (!isEditing || !inputRef.current) return;
+
+    const id = setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 1);
+
+    return () => clearTimeout(id);
   }, [isEditing]);
 
   return (
