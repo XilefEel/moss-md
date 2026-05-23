@@ -5,7 +5,7 @@ import {
   useCurrentFilePath,
   useFileTreeActions,
 } from "../../stores/useFileTreeStore";
-import FileTreeContextMenu from "../context-menu/FileTreeContextMenu";
+import EntryContextMenu from "../context-menu/EntryContextMenu";
 import { Entry } from "../../lib/types";
 import { saveLastFilePath } from "../../lib/storage";
 import { useInlineEdit } from "../../hooks/useInlineEdit";
@@ -52,7 +52,7 @@ export default function FileNode({
   }, [isEditing]);
 
   return (
-    <FileTreeContextMenu
+    <EntryContextMenu
       entry={entry}
       onRename={() => setIsEditing(true)}
       isDirectory={false}
@@ -95,6 +95,6 @@ export default function FileNode({
           />
         </div>
       </button>
-    </FileTreeContextMenu>
+    </EntryContextMenu>
   );
 }
