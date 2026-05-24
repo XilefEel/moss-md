@@ -43,23 +43,28 @@
 }
 
 .prose {
-  --tw-prose-body: theme(colors.zinc.700);
-  --tw-prose-headings: theme(colors.zinc.900);
-  --tw-prose-links: theme(colors.zinc.900);
-  --tw-prose-bold: theme(colors.zinc.900);
-  --tw-prose-quotes: theme(colors.zinc.600);
-  --tw-prose-hr: theme(colors.zinc.200);
-  --tw-prose-bullets: theme(colors.zinc.400);
+  --tw-prose-body: theme(--color-zinc-700);
+  --tw-prose-headings: theme(--color-zinc-900);
+  --tw-prose-links: theme(--color-zinc-900);
+  --tw-prose-bold: theme(--color-zinc-900);
+  --tw-prose-quotes: theme(--color-zinc-600);
+  --tw-prose-hr: theme(--color-zinc-200);
+  --tw-prose-bullets: theme(--color-zinc-400);
 }
 
 .dark .prose {
-  --tw-prose-body: theme(colors.zinc.300);
-  --tw-prose-headings: theme(colors.zinc.100);
-  --tw-prose-links: theme(colors.zinc.100);
-  --tw-prose-bold: theme(colors.zinc.100);
-  --tw-prose-quotes: theme(colors.zinc.400);
-  --tw-prose-hr: theme(colors.zinc.800);
-  --tw-prose-bullets: theme(colors.zinc.600);
+  --tw-prose-body: theme(--color-zinc-300);
+  --tw-prose-headings: theme(--color-zinc-100);
+  --tw-prose-links: theme(--color-zinc-100);
+  --tw-prose-bold: theme(--color-zinc-100);
+  --tw-prose-quotes: theme(--color-zinc-400);
+  --tw-prose-hr: theme(--color-zinc-800);
+  --tw-prose-bullets: theme(--color-zinc-600);
+}
+
+.prose code::before,
+.prose code::after {
+  content: "" !important;
 }
 
 .cm-editor.cm-focused {
@@ -72,4 +77,56 @@
 
 .dark .cm-content {
   color: theme(--color-zinc-300);
+}
+
+.custom-block-title {
+  font-weight: 700;
+}
+
+.tip {
+  border-left: 4px solid var(--color-emerald-500);
+  background: var(--color-emerald-50);
+  padding: 0.25rem 1rem;
+  border-radius: 0.375rem;
+  margin: 1.5rem 0;
+}
+
+.dark .tip {
+  background: rgb(from var(--color-emerald-500) r g b / 0.1);
+}
+
+.info {
+  border-left: 4px solid var(--color-blue-500);
+  background: var(--color-blue-50);
+  padding: 0.25rem 1rem;
+  border-radius: 0.375rem;
+  margin: 1.5rem 0;
+}
+
+.dark .info {
+  background: rgb(from var(--color-blue-500) r g b / 0.1);
+}
+
+.warning {
+  border-left: 4px solid var(--color-yellow-500);
+  background: var(--color-yellow-50);
+  padding: 0.25rem 1rem;
+  border-radius: 0.375rem;
+  margin: 1.5rem 0;
+}
+
+.dark .warning {
+  background: rgb(from var(--color-yellow-500) r g b / 0.1);
+}
+
+.danger {
+  border-left: 4px solid var(--color-red-500);
+  background: var(--color-red-50);
+  padding: 0.25rem 1rem;
+  border-radius: 0.375rem;
+  margin: 1.5rem 0;
+}
+
+.dark .danger {
+  background: rgb(from var(--color-red-500) r g b / 0.1);
 }
