@@ -26,7 +26,7 @@ export default function Sidebar({
 
   return (
     <SidebarContextMenu>
-      <div className="h-full overflow-auto px-8">
+      <div className="overflow-auto px-8">
         {currentDir ? (
           <>
             {newEntry?.dirPath === currentDir && (

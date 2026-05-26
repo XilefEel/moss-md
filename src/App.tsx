@@ -170,7 +170,7 @@ export default function App() {
           <Panel
             id="sidebar"
             minSize="15%"
-            className="pt-12 pb-6"
+            className="mt-12 mb-6"
             panelRef={sidebarRef}
             collapsible
             onResize={handleSidebarResize}
@@ -185,7 +185,7 @@ export default function App() {
             )}
           />
 
-          <Panel id="viewer" className="px-8 pt-12 pb-6" minSize="15%">
+          <Panel id="viewer" className="mt-8 mb-6 px-8" minSize="15%">
             <Viewer content={content} />
           </Panel>
 
@@ -199,7 +199,7 @@ export default function App() {
           <Panel
             id="editor"
             minSize="15%"
-            className="px-8 pt-12 pb-6"
+            className="mt-8 mb-6 px-8"
             panelRef={editorRef}
             collapsible
             onResize={handleEditorResize}
