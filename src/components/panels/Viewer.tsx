@@ -1,7 +1,39 @@
 import MarkdownIt from "markdown-it";
 import container from "markdown-it-container";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import typescript from "highlight.js/lib/languages/typescript";
+import python from "highlight.js/lib/languages/python";
+import rust from "highlight.js/lib/languages/rust";
+import c from "highlight.js/lib/languages/c";
+import html from "highlight.js/lib/languages/xml";
+import css from "highlight.js/lib/languages/css";
+import "highlight.js/styles/monokai-sublime.css";
 
-const md = new MarkdownIt();
+hljs.registerLanguage("html", html);
+hljs.registerLanguage("css", css);
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("typescript", typescript);
+hljs.registerLanguage("python", python);
+hljs.registerLanguage("rust", rust);
+hljs.registerLanguage("c", c);
+
+const md = new MarkdownIt({
+  highlight(str: string, lang: string): string {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        const highlighted = hljs.highlight(str, {
+          language: lang,
+          ignoreIllegals: true,
+        }).value;
+
+        return `<pre><code class="hljs language-${lang}">${highlighted}</code></pre>`;
+      } catch {}
+    }
+
+    return `<pre><code class="hljs">${md.utils.escapeHtml(str)}</code></pre>`;
+  },
+});
 
 md.use(container, "tip", {
   render(tokens: any[], idx: number) {

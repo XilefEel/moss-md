@@ -91,7 +91,7 @@ export default function Editor({
 
     viewRef.current = view;
     return () => view.destroy();
-  }, [isDark, content, onChange]);
+  }, [isDark]);
 
   useEffect(() => {
     if (!viewRef.current) return;
