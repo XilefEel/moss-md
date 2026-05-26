@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 import { minimalSetup } from "codemirror";
-import { EditorView } from "@codemirror/view";
+import { EditorView, keymap } from "@codemirror/view";
 import { Compartment, EditorState } from "@codemirror/state";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
+import { search, searchKeymap } from "@codemirror/search";
 
 const themeCompartment = new Compartment();
 
@@ -84,6 +85,20 @@ export default function Editor({
           EditorView.updateListener.of((update) => {
             if (update.docChanged) onChange(update.state.doc.toString());
           }),
+          search({ top: true }),
+          keymap.of(searchKeymap),
+          EditorState.phrases.of({
+            Find: "Search...",
+            Replace: "Replace with...",
+            next: "Next",
+            previous: "Prev",
+            all: "All",
+            "match case": "Case",
+            "by word": "Word",
+            regexp: "Regex",
+            replace: "Replace",
+            "replace all": "Replace All",
+          }),
         ],
       }),
       parent: containerRef.current,
@@ -113,6 +128,20 @@ export default function Editor({
       ]),
     });
   }, [isDark]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new MutationObserver(() => {
+      containerRef.current
+        ?.querySelectorAll(".cm-textfield")
+        .forEach((input) => {
+          input.setAttribute("autocomplete", "off");
+          input.setAttribute("spellcheck", "false");
+        });
+    });
+    observer.observe(containerRef.current, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="h-full text-base">
