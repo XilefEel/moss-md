@@ -29,6 +29,11 @@ export default function SearchModal({
     onClose();
   };
 
+  const handleOpen = (path: string) => {
+    onSelect(path);
+    handleClose();
+  };
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 1);
@@ -64,8 +69,7 @@ export default function SearchModal({
 
       case "Enter":
         if (results[activeIndex]) {
-          onSelect(results[activeIndex].path);
-          handleClose();
+          handleOpen(results[activeIndex].path);
         }
         break;
 
@@ -85,12 +89,15 @@ export default function SearchModal({
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
       <div
-        className="relative w-full max-w-lg rounded-xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+        className="relative w-full max-w-lg rounded-xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
         onClick={(e) => e.stopPropagation()}
       >
         <input
           ref={inputRef}
           value={query}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Search files..."
@@ -104,30 +111,45 @@ export default function SearchModal({
 
         {results.length > 0 && (
           <div className="max-h-80 overflow-auto p-1">
-            {results.map((result, index) => (
-              <button
-                key={result.path}
-                onClick={() => {
-                  onSelect(result.path);
-                  onClose();
-                }}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm",
-                  index === activeIndex
-                    ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
-                    : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800",
-                )}
-              >
-                <FileText className="size-4 shrink-0" />
-                {result.name}
-              </button>
-            ))}
+            {results.map((result, index) => {
+              const matchSet = new Set(result.matches);
+
+              return (
+                <button
+                  key={result.path}
+                  onClick={() => handleOpen(result.path)}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm",
+                    index === activeIndex
+                      ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
+                      : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800",
+                  )}
+                >
+                  <FileText className="size-4 shrink-0" />
+
+                  <p>
+                    {result.name.split("").map((char, i) => (
+                      <span
+                        key={i}
+                        className={
+                          matchSet.has(i)
+                            ? "font-semibold text-emerald-500"
+                            : ""
+                        }
+                      >
+                        {char}
+                      </span>
+                    ))}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         )}
 
         {query && results.length === 0 && (
-          <p className="px-4 py-6 text-center text-sm text-zinc-400">
-            No files found
+          <p className="px-4 py-6 text-center text-sm text-zinc-400 dark:text-zinc-500">
+            No files found.
           </p>
         )}
       </div>
