@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { dirname, join } from "@tauri-apps/api/path";
 import { create, mkdir, remove, rename } from "@tauri-apps/plugin-fs";
-import { Entry } from "./types";
+import { Entry, SearchResult } from "./types";
 
 export const createFile = async (
   dirPath: string,
@@ -44,4 +44,8 @@ export async function deleteEntry(
 
 export async function buildTree(dirPath: string) {
   return await invoke<Entry[]>("build_tree", { dirPath });
+}
+
+export async function fuzzySearch(dirPath: string, query: string) {
+  return await invoke<SearchResult[]>("fuzzy_search", { dirPath, query });
 }

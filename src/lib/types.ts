@@ -4,3 +4,10 @@ export type Entry = {
   isDirectory: boolean;
   children: Entry[] | null;
 };
+
+export type SearchResult = {
+  path: string;
+  name: string;
+  score: number;
+  matches: number[];
+};

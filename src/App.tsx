@@ -29,6 +29,7 @@ import {
   useCurrentFilePath,
   useFileTreeActions,
 } from "./stores/useFileTreeStore";
+import SearchModal from "./components/modals/SearchModal";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -128,7 +129,7 @@ export default function App() {
     setMode,
   });
 
-  useKeyboardShortcuts({
+  const { isSearchOpen, setIsSearchOpen } = useKeyboardShortcuts({
     handleSave,
     handleOpen: handleOpenDirectory,
     toggleTheme,
@@ -214,6 +215,12 @@ export default function App() {
       </div>
 
       <BottomBar content={content} />
+
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSelect={handleSelectFile}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type BlockedShortcut = {
   key: string;
@@ -6,11 +6,9 @@ type BlockedShortcut = {
 };
 
 const BLOCKED_SHORTCUTS: BlockedShortcut[] = [
-  { key: "p", needsShift: false },
   { key: "f", needsShift: false },
   { key: "g", needsShift: false },
   { key: "j", needsShift: false },
-  { key: "p", needsShift: true },
   { key: "g", needsShift: true },
 ];
 
@@ -27,6 +25,8 @@ export function useKeyboardShortcuts({
   handleToggleMode: () => void;
   handleToggleSidebar: () => void;
 }) {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
@@ -64,6 +64,10 @@ export function useKeyboardShortcuts({
             e.preventDefault();
             handleToggleSidebar();
             break;
+          case "p":
+            e.preventDefault();
+            setIsSearchOpen((open) => !open);
+            break;
         }
       }
     };
@@ -77,4 +81,9 @@ export function useKeyboardShortcuts({
     toggleTheme,
     handleToggleSidebar,
   ]);
+
+  return {
+    isSearchOpen,
+    setIsSearchOpen,
+  };
 }
