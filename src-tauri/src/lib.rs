@@ -1,6 +1,6 @@
 mod io;
 
-use io::build_tree;
+use io::{build_tree, fuzzy_search};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -9,7 +9,7 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![build_tree])
+        .invoke_handler(tauri::generate_handler![build_tree, fuzzy_search])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
