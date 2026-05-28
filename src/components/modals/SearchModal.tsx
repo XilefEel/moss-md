@@ -1,7 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { FileText } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useCurrentDir } from "../../stores/useFileTreeStore";
+import {
+  useCurrentDir,
+  useFileTreeActions,
+} from "../../stores/useFileTreeStore";
 import { SearchResult } from "../../lib/types";
 import { fuzzySearch } from "../../lib/io";
 
@@ -14,6 +17,7 @@ export default function SearchModal({
   onClose: () => void;
   onSelect: (path: string) => void;
 }) {
+  const { createFile } = useFileTreeActions();
   const currentDir = useCurrentDir();
 
   const [query, setQuery] = useState("");
@@ -27,6 +31,14 @@ export default function SearchModal({
     setResults([]);
     setActiveIndex(0);
     onClose();
+  };
+
+  const handleCreateFile = async () => {
+    if (!query || !currentDir) return;
+
+    const newFile = await createFile(currentDir, query);
+    onSelect(newFile);
+    handleClose();
   };
 
   const handleOpen = (path: string) => {
@@ -55,7 +67,7 @@ export default function SearchModal({
     search();
   }, [query, currentDir]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
@@ -68,7 +80,9 @@ export default function SearchModal({
         break;
 
       case "Enter":
-        if (results[activeIndex]) {
+        if (query && results.length === 0) {
+          await handleCreateFile();
+        } else if (results[activeIndex]) {
           handleOpen(results[activeIndex].path);
         }
         break;
@@ -148,9 +162,13 @@ export default function SearchModal({
         )}
 
         {query && results.length === 0 && (
-          <p className="px-4 py-6 text-center text-sm text-zinc-400 dark:text-zinc-500">
-            No files found.
-          </p>
+          <button
+            onClick={handleCreateFile}
+            className="flex items-center gap-2 p-4 text-sm text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+          >
+            <Plus className="size-4 shrink-0" />
+            Create "{query}.md"
+          </button>
         )}
       </div>
     </div>

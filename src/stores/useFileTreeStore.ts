@@ -109,10 +109,12 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
   setNewEntry: (entry) => set({ newEntry: entry }),
 
   createFile: async (dirPath, name) => {
-    const filePath = await io.createFile(dirPath, name);
+    const fileName = name.endsWith(".md") ? name : `${name}.md`;
+
+    const filePath = await io.createFile(dirPath, fileName);
 
     const newFile: Entry = {
-      name: name.endsWith(".md") ? name : `${name}.md`,
+      name: fileName,
       path: filePath,
       isDirectory: false,
       children: [],
