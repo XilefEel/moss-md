@@ -43,28 +43,41 @@
 }
 
 .prose {
-  --tw-prose-body: theme(--color-zinc-700);
-  --tw-prose-headings: theme(--color-zinc-900);
-  --tw-prose-links: theme(--color-zinc-900);
-  --tw-prose-bold: theme(--color-zinc-900);
-  --tw-prose-quotes: theme(--color-zinc-600);
-  --tw-prose-hr: theme(--color-zinc-200);
-  --tw-prose-bullets: theme(--color-zinc-400);
+  --tw-prose-body: var(--color-zinc-700);
+  --tw-prose-headings: var(--color-zinc-900);
+  --tw-prose-links: var(--color-zinc-900);
+  --tw-prose-bold: var(--color-zinc-900);
+  --tw-prose-quotes: var(--color-zinc-600);
+  --tw-prose-hr: var(--color-zinc-200);
+  --tw-prose-bullets: var(--color-zinc-400);
 }
 
 .dark .prose {
-  --tw-prose-body: theme(--color-zinc-300);
-  --tw-prose-headings: theme(--color-zinc-100);
-  --tw-prose-links: theme(--color-zinc-100);
-  --tw-prose-bold: theme(--color-zinc-100);
-  --tw-prose-quotes: theme(--color-zinc-400);
-  --tw-prose-hr: theme(--color-zinc-800);
-  --tw-prose-bullets: theme(--color-zinc-600);
+  --tw-prose-body: var(--color-zinc-300);
+  --tw-prose-headings: var(--color-zinc-100);
+  --tw-prose-links: var(--color-zinc-100);
+  --tw-prose-bold: var(--color-zinc-100);
+  --tw-prose-quotes: var(--color-zinc-400);
+  --tw-prose-hr: var(--color-zinc-800);
+  --tw-prose-bullets: var(--color-zinc-600);
 }
 
-.prose code::before,
-.prose code::after {
-  content: "" !important;
+.prose :not(pre) > code {
+  background-color: var(--color-zinc-100);
+  color: var(--color-emerald-500);
+  font-weight: normal;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+
+  .dark & {
+    background-color: var(--color-zinc-800);
+    color: var(--color-emerald-400);
+  }
+
+  &::before,
+  &::after {
+    content: none;
+  }
 }
 
 .cm-editor.cm-focused {
@@ -72,11 +85,11 @@
 }
 
 .cm-content {
-  color: theme(--color-zinc-700);
+  color: var(--color-zinc-700);
 }
 
 .dark .cm-content {
-  color: theme(--color-zinc-300);
+  color: var(--color-zinc-300);
 }
 
 .custom-block-title {
@@ -203,37 +216,37 @@ pre code.hljs {
 
   width: 1.1rem;
   height: 1.1rem;
-  border: 1px solid theme("colors.zinc.300");
+  border: 1px solid var(--color-zinc-300);
   border-radius: 4px;
 
   .dark & {
-    border-color: theme("colors.zinc.600");
+    border-color: var(--color-zinc-600);
   }
 
   &:hover {
-    border-color: theme("colors.zinc.400");
+    border-color: var(--color-zinc-400);
 
     .dark & {
-      border-color: theme("colors.zinc.500");
+      border-color: var(--color-zinc-500);
     }
   }
 
   &:checked {
-    background-color: theme("colors.emerald.500");
-    border-color: theme("colors.emerald.500");
+    background-color: var(--color-emerald-500);
+    border-color: var(--color-emerald-500);
 
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
     background-size: 120%;
     background-position: center;
 
     .dark & {
-      background-color: theme("colors.emerald.400");
-      border-color: theme("colors.emerald.400");
+      background-color: var(--color-emerald-400);
+      border-color: var(--color-emerald-400);
     }
   }
 
   &:focus-visible {
-    outline: 2px solid theme("colors.emerald.400");
+    outline: 2px solid var(--color-emerald-400);
     outline-offset: 2px;
   }
 }
