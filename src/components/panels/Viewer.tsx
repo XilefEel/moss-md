@@ -9,6 +9,8 @@ import c from "highlight.js/lib/languages/c";
 import html from "highlight.js/lib/languages/xml";
 import css from "highlight.js/lib/languages/css";
 import "highlight.js/styles/monokai-sublime.css";
+import { useEffect, useRef } from "react";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 hljs.registerLanguage("html", html);
 hljs.registerLanguage("css", css);
@@ -83,9 +85,35 @@ md.use(container, "danger", {
   },
 });
 
+md.renderer.rules.link_open = (tokens, idx, options, _env, self) => {
+  tokens[idx].attrSet("target", "_blank");
+  return self.renderToken(tokens, idx, options);
+};
+
 export default function Viewer({ content }: { content: string }) {
+  const viewerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest("a");
+      if (!anchor?.href) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      openUrl(anchor.href);
+    };
+
+    viewer.addEventListener("click", handleLinkClick);
+    return () => viewer.removeEventListener("click", handleLinkClick);
+  }, [content]);
+
   return (
     <div
+      ref={viewerRef}
       className="prose prose-zinc dark:prose-invert mx-auto max-w-2xl"
       dangerouslySetInnerHTML={{ __html: md.render(content) }}
     />
