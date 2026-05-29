@@ -72,7 +72,7 @@ export default function FolderNode({
             if (!isEditing) setIsOpen(!isOpen);
           }}
           className={cn(
-            "mb-1 flex w-full items-center gap-1 truncate rounded px-2 py-0.5 text-sm",
+            "mb-1 flex w-full items-center gap-1 truncate rounded px-2 py-0.5 text-sm transition-colors",
             "hover:bg-zinc-50 dark:hover:bg-zinc-700/50",
             "text-zinc-800 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-zinc-100",
           )}

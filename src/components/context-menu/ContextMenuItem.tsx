@@ -17,7 +17,7 @@ export default function ContextMenuItem({
     <ContextMenu.Item
       onSelect={onSelect}
       className={cn(
-        "flex cursor-default items-center gap-2 rounded px-2 py-1 text-sm outline-none select-none",
+        "flex cursor-default items-center gap-2 rounded px-2 py-1 text-sm transition-colors outline-none select-none",
         "text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100",
         "hover:bg-zinc-50 dark:hover:bg-zinc-700/50",
         isDelete &&

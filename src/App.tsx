@@ -164,6 +164,7 @@ export default function App() {
         onToggleMode={handleToggleMode}
         onToggleSidebar={handleToggleSidebar}
         onToggleTheme={toggleTheme}
+        onToggleSearch={() => setIsSearchOpen((open) => !open)}
       />
 
       <div className="flex h-screen">

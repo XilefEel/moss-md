@@ -4,6 +4,7 @@ import {
   Moon,
   PanelLeftOpen,
   PanelRightOpen,
+  Search,
   Sun,
 } from "lucide-react";
 import { confirm } from "@tauri-apps/plugin-dialog";
@@ -19,6 +20,7 @@ export default function Titlebar({
   onToggleMode,
   onToggleSidebar,
   onToggleTheme,
+  onToggleSearch,
 }: {
   mode: "view" | "edit";
   isSidebarOpen: boolean;
@@ -29,6 +31,7 @@ export default function Titlebar({
   onToggleMode: () => void;
   onToggleSidebar: () => void;
   onToggleTheme: () => void;
+  onToggleSearch: () => void;
 }) {
   const handleClose = async () => {
     if (!isDirty) {
@@ -49,7 +52,7 @@ export default function Titlebar({
   return (
     <div
       data-tauri-drag-region
-      className="fixed top-0 right-0 left-0 z-50 flex h-8 flex-row items-center gap-4 bg-white px-4 select-none dark:bg-zinc-900"
+      className="fixed top-0 right-0 left-0 z-50 flex h-8 flex-row items-center gap-5 bg-white px-4 select-none dark:bg-zinc-900"
     >
       <div className="flex flex-row items-center gap-2.5">
         <button
@@ -77,11 +80,19 @@ export default function Titlebar({
             <PanelLeftOpen className="size-4 shrink-0" />
           )}
         </button>
+
         <button
           onClick={onOpen}
           className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
         >
           <FolderOpen className="size-4 shrink-0" />
+        </button>
+
+        <button
+          onClick={onToggleSearch}
+          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+        >
+          <Search className="size-4 shrink-0" />
         </button>
       </div>
 
@@ -89,27 +100,29 @@ export default function Titlebar({
         <div className="size-1.5 rounded-full bg-green-400 dark:bg-green-500" />
       )}
 
-      <button
-        onClick={onToggleTheme}
-        className="ml-auto text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-      >
-        {isDark ? (
-          <Sun className="size-4 shrink-0" />
-        ) : (
-          <Moon className="size-4 shrink-0" />
-        )}
-      </button>
+      <div className="ml-auto flex items-center gap-2.5">
+        <button
+          onClick={onToggleTheme}
+          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+        >
+          {isDark ? (
+            <Sun className="size-4 shrink-0" />
+          ) : (
+            <Moon className="size-4 shrink-0" />
+          )}
+        </button>
 
-      <button
-        onClick={onToggleMode}
-        className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-      >
-        {mode === "view" ? (
-          <PanelRightOpen className="size-4 shrink-0" />
-        ) : (
-          <PanelLeftOpen className="size-4 shrink-0" />
-        )}
-      </button>
+        <button
+          onClick={onToggleMode}
+          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+        >
+          {mode === "view" ? (
+            <PanelRightOpen className="size-4 shrink-0" />
+          ) : (
+            <PanelLeftOpen className="size-4 shrink-0" />
+          )}
+        </button>
+      </div>
     </div>
   );
 }

@@ -133,7 +133,7 @@ export default function SearchModal({
                   key={result.path}
                   onClick={() => handleOpen(result.path)}
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm",
+                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                     index === activeIndex
                       ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
                       : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800",
@@ -164,7 +164,7 @@ export default function SearchModal({
         {query && results.length === 0 && (
           <button
             onClick={handleCreateFile}
-            className="flex items-center gap-2 p-4 text-sm text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+            className="flex items-center gap-2 p-4 text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
           >
             <Plus className="size-4 shrink-0" />
             Create "{query}.md"

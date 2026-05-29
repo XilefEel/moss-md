@@ -64,7 +64,7 @@ export default function FileNode({
           if (!isEditing || isActive) onSelectFile(entry.path);
         }}
         className={cn(
-          "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5",
+          "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5 transition-colors",
           "truncate text-sm text-zinc-800 dark:text-zinc-200",
           isActive
             ? "bg-emerald-50 font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
