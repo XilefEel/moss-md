@@ -30,6 +30,7 @@ import {
   useFileTreeActions,
 } from "./stores/useFileTreeStore";
 import SearchModal from "./components/modals/SearchModal";
+import { listen } from "@tauri-apps/api/event";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -37,6 +38,8 @@ export default function App() {
 
   const [mode, setMode] = useState<"view" | "edit" | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean | null>(null);
+
+  const [isDragging, setIsDragging] = useState(false);
 
   const sidebarRef = useRef<PanelImperativeHandle>(null);
   const editorRef = useRef<PanelImperativeHandle>(null);
@@ -149,11 +152,38 @@ export default function App() {
     else editorRef.current?.collapse();
   }, [mode]);
 
+  useEffect(() => {
+    const unlistenDrop = listen("tauri://drag-drop", async (event: any) => {
+      const paths = event.payload.paths;
+      const mdFile = paths.find((p: string) => p.endsWith(".md"));
+      if (!mdFile) return;
+      setIsDragging(false);
+      await handleSelectFile(mdFile);
+    });
+
+    const unlistenEnter = listen("tauri://drag-enter", () =>
+      setIsDragging(true),
+    );
+    const unlistenLeave = listen("tauri://drag-leave", () =>
+      setIsDragging(false),
+    );
+
+    return () => {
+      unlistenDrop.then((fn) => fn());
+      unlistenEnter.then((fn) => fn());
+      unlistenLeave.then((fn) => fn());
+    };
+  }, []);
+
   return (
     <div
       className="flex h-screen flex-col bg-white dark:bg-zinc-900"
       onContextMenu={(e) => e.preventDefault()}
     >
+      {isDragging && (
+        <div className="absolute inset-0 z-9999 bg-emerald-500/10" />
+      )}
+
       <Titlebar
         mode={mode!}
         isSidebarOpen={isSidebarOpen!}
