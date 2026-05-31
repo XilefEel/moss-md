@@ -154,10 +154,12 @@ export default function App() {
 
   useEffect(() => {
     const unlistenDrop = listen("tauri://drag-drop", async (event: any) => {
-      const paths = event.payload.paths;
+      setIsDragging(false);
+
+      const paths = event.payload.paths as string[];
       const mdFile = paths.find((p: string) => p.endsWith(".md"));
       if (!mdFile) return;
-      setIsDragging(false);
+
       await handleSelectFile(mdFile);
     });
 
