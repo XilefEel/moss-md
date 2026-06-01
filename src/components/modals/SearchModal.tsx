@@ -37,7 +37,7 @@ export default function SearchModal({
     if (!query || !currentDir) return;
 
     const newFile = await createFile(currentDir, query);
-    onSelect(newFile);
+    onSelect(newFile!);
     handleClose();
   };
 

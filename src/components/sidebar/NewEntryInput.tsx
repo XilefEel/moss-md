@@ -19,7 +19,7 @@ export function NewEntryInput({
 
     if (newEntry.type === "file") {
       const path = await createFile(newEntry.dirPath, name);
-      onSelectFile(path);
+      onSelectFile(path!);
     } else {
       await createFolder(newEntry.dirPath, name);
     }

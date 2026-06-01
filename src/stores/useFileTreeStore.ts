@@ -87,8 +87,8 @@ type FileTreeStore = {
     entry: { dirPath: string; type: "file" | "folder" } | null,
   ) => void;
 
-  createFile: (dirPath: string, name: string) => Promise<string>;
-  createFolder: (dirPath: string, name: string) => Promise<string>;
+  createFile: (dirPath: string, name: string) => Promise<string | null>;
+  createFolder: (dirPath: string, name: string) => Promise<string | null>;
   renameEntry: (oldPath: string, newName: string) => Promise<string>;
   deleteEntry: (path: string, isDirectory: boolean) => Promise<void>;
 
@@ -112,6 +112,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
     const fileName = name.endsWith(".md") ? name : `${name}.md`;
 
     const filePath = await io.createFile(dirPath, fileName);
+    if (!filePath) return null;
 
     const newFile: Entry = {
       name: fileName,
@@ -134,6 +135,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
 
   createFolder: async (dirPath, name) => {
     const folderPath = await io.createFolder(dirPath, name);
+    if (!folderPath) return null;
 
     const newFolder: Entry = {
       name,

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { getAncestorPaths } from "../lib/utils";
 import {
   getLastDir,
+  saveLastFilePath,
   getLastFilePath,
   getIsSidebarOpen,
   getViewMode,
@@ -36,17 +37,28 @@ export function useRestoreSession({
       if (lastDir) setCurrentDir(lastDir);
 
       if (lastFilePath) {
-        const text = await readTextFile(lastFilePath);
-        const normalized = text.replace(/\r\n/g, "\n");
+        try {
+          const text = await readTextFile(lastFilePath);
+          const normalized = text.replace(/\r\n/g, "\n");
 
-        setCurrentFilePath(lastFilePath);
-        setContent(normalized);
-        savedContentRef.current = normalized;
+          setCurrentFilePath(lastFilePath);
+          setContent(normalized);
+          savedContentRef.current = normalized;
+        } catch (error) {
+          saveLastFilePath("");
+          setCurrentFilePath(null);
+          setContent("");
+          savedContentRef.current = "";
+        }
       }
 
       if (lastDir && lastFilePath) {
-        const ancestors = await getAncestorPaths(lastFilePath, lastDir);
-        setOpenFolders(new Set(ancestors));
+        try {
+          const ancestors = await getAncestorPaths(lastFilePath, lastDir);
+          setOpenFolders(new Set(ancestors));
+        } catch (error) {
+          setOpenFolders(new Set());
+        }
       }
 
       if (isSidebarOpen !== null) setIsSidebarOpen(isSidebarOpen);
