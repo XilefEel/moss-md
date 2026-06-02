@@ -3,32 +3,23 @@ import { dirname, join } from "@tauri-apps/api/path";
 import { create, mkdir, remove, rename } from "@tauri-apps/plugin-fs";
 import { Entry, SearchResult } from "./types";
 
-export const createFile = async (
-  dirPath: string,
-  name: string,
-): Promise<string | null> => {
+export const createFile = async (filePath: string): Promise<boolean> => {
   try {
-    const fileName = name.endsWith(".md") ? name : `${name}.md`;
-    const filePath = await join(dirPath, fileName);
     await create(filePath);
-    return filePath;
+    return true;
   } catch (error) {
     console.error("Error creating file:", error);
-    return null;
+    return false;
   }
 };
 
-export const createFolder = async (
-  dirPath: string,
-  name: string,
-): Promise<string | null> => {
+export const createFolder = async (folderPath: string): Promise<boolean> => {
   try {
-    const folderPath = await join(dirPath, name);
     await mkdir(folderPath);
-    return folderPath;
+    return true;
   } catch (error) {
     console.error("Error creating folder:", error);
-    return null;
+    return false;
   }
 };
 

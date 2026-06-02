@@ -37,8 +37,10 @@ export default function SearchModal({
     if (!query || !currentDir) return;
 
     const newFile = await createFile(currentDir, query);
-    onSelect(newFile!);
-    handleClose();
+    if (newFile) {
+      onSelect(newFile);
+      handleClose();
+    }
   };
 
   const handleOpen = (path: string) => {

@@ -19,12 +19,14 @@ export function NewEntryInput({
 
     if (newEntry.type === "file") {
       const path = await createFile(newEntry.dirPath, name);
-      onSelectFile(path!);
+      if (path) {
+        setNewEntry(null);
+        onSelectFile(path);
+      }
     } else {
-      await createFolder(newEntry.dirPath, name);
+      const path = await createFolder(newEntry.dirPath, name);
+      if (path) setNewEntry(null);
     }
-
-    setNewEntry(null);
   };
 
   const handleBlur = () => (name ? handleConfirm() : setNewEntry(null));

@@ -2,6 +2,18 @@ import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { Entry } from "../lib/types";
 import * as io from "../lib/io";
+import { join } from "@tauri-apps/api/path";
+
+const getAllPaths = (
+  entries: Entry[],
+  paths = new Set<string>(),
+): Set<string> => {
+  for (const e of entries) {
+    paths.add(e.path);
+    if (e.children?.length) getAllPaths(e.children, paths);
+  }
+  return paths;
+};
 
 const sortEntries = (entries: Entry[]): Entry[] => {
   return entries.toSorted((a, b) => {
@@ -110,9 +122,12 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
 
   createFile: async (dirPath, name) => {
     const fileName = name.endsWith(".md") ? name : `${name}.md`;
+    const filePath = await join(dirPath, fileName);
 
-    const filePath = await io.createFile(dirPath, fileName);
-    if (!filePath) return null;
+    if (getAllPaths(get().entries).has(filePath)) return null;
+
+    const success = await io.createFile(filePath);
+    if (!success) return null;
 
     const newFile: Entry = {
       name: fileName,
@@ -134,8 +149,12 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
   },
 
   createFolder: async (dirPath, name) => {
-    const folderPath = await io.createFolder(dirPath, name);
-    if (!folderPath) return null;
+    const folderPath = await join(dirPath, name);
+
+    if (getAllPaths(get().entries).has(folderPath)) return null;
+
+    const success = await io.createFolder(folderPath);
+    if (!success) return null;
 
     const newFolder: Entry = {
       name,
