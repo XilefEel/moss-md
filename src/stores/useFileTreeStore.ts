@@ -2,90 +2,17 @@ import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { Entry } from "../lib/types";
 import * as io from "../lib/io";
-import { join } from "@tauri-apps/api/path";
-
-const getAllPaths = (
-  entries: Entry[],
-  paths = new Set<string>(),
-): Set<string> => {
-  for (const e of entries) {
-    paths.add(e.path);
-    if (e.children?.length) getAllPaths(e.children, paths);
-  }
-  return paths;
-};
-
-const sortEntries = (entries: Entry[]): Entry[] => {
-  return entries.toSorted((a, b) => {
-    if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
-    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-  });
-};
-
-const insertIntoTree = (
-  entries: Entry[],
-  rootDir: string,
-  dirPath: string,
-  newEntry: Entry,
-): Entry[] => {
-  if (dirPath === rootDir) {
-    return sortEntries([...entries, newEntry]);
-  }
-
-  return entries.map((e) => {
-    if (e.path === dirPath) {
-      return { ...e, children: sortEntries([...(e.children ?? []), newEntry]) };
-    }
-    if (e.isDirectory && dirPath.startsWith(e.path) && e.children) {
-      return {
-        ...e,
-        children: insertIntoTree(e.children, rootDir, dirPath, newEntry),
-      };
-    }
-    return e;
-  });
-};
-
-const renameInTree = (
-  entries: Entry[],
-  oldPath: string,
-  newPath: string,
-  newName: string,
-): Entry[] => {
-  return entries.map((e) => {
-    if (e.path === oldPath) {
-      return { ...e, name: newName, path: newPath };
-    }
-    if (e.isDirectory && oldPath.startsWith(e.path) && e.children) {
-      return {
-        ...e,
-        children: sortEntries(
-          renameInTree(e.children, oldPath, newPath, newName),
-        ),
-      };
-    }
-    return e;
-  });
-};
-
-const removeFromTree = (entries: Entry[], path: string): Entry[] => {
-  const result: Entry[] = [];
-
-  for (const e of entries) {
-    if (e.path === path) continue;
-
-    result.push(
-      e.isDirectory && path.startsWith(e.path) && e.children
-        ? { ...e, children: removeFromTree(e.children, path) }
-        : e,
-    );
-  }
-
-  return result;
-};
+import { dirname, join } from "@tauri-apps/api/path";
+import {
+  insertIntoTree,
+  renameInTree,
+  buildPathSet,
+  removeFromTree,
+} from "../lib/fileTree";
 
 type FileTreeStore = {
   entries: Entry[];
+  pathSet: Set<string>;
   currentDir: string | null;
   currentFilePath: string | null;
   openFolders: Set<string>;
@@ -109,8 +36,11 @@ type FileTreeStore = {
 
 const useFileTreeStore = create<FileTreeStore>((set, get) => ({
   entries: [],
+  pathSet: new Set(),
+
   currentFilePath: null,
   currentDir: null,
+
   openFolders: new Set(),
   newEntry: null,
 
@@ -124,7 +54,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
     const fileName = name.endsWith(".md") ? name : `${name}.md`;
     const filePath = await join(dirPath, fileName);
 
-    if (getAllPaths(get().entries).has(filePath)) return null;
+    if (get().pathSet.has(filePath)) return null;
 
     const success = await io.createFile(filePath);
     if (!success) return null;
@@ -136,14 +66,20 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
       children: [],
     };
 
-    set((state) => ({
-      entries: insertIntoTree(
-        state.entries,
-        state.currentDir!,
-        dirPath,
-        newFile,
-      ),
-    }));
+    set((state) => {
+      const newPathSet = new Set(state.pathSet);
+      newPathSet.add(filePath);
+
+      return {
+        entries: insertIntoTree(
+          state.entries,
+          state.currentDir!,
+          dirPath,
+          newFile,
+        ),
+        pathSet: newPathSet,
+      };
+    });
 
     return filePath;
   },
@@ -151,7 +87,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
   createFolder: async (dirPath, name) => {
     const folderPath = await join(dirPath, name);
 
-    if (getAllPaths(get().entries).has(folderPath)) return null;
+    if (get().pathSet.has(folderPath)) return null;
 
     const success = await io.createFolder(folderPath);
     if (!success) return null;
@@ -163,28 +99,45 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
       children: [],
     };
 
-    set((state) => ({
-      entries: insertIntoTree(
-        state.entries,
-        state.currentDir!,
-        dirPath,
-        newFolder,
-      ),
-    }));
+    set((state) => {
+      const newPathSet = new Set(state.pathSet);
+      newPathSet.add(folderPath);
+
+      return {
+        entries: insertIntoTree(
+          state.entries,
+          state.currentDir!,
+          dirPath,
+          newFolder,
+        ),
+        pathSet: newPathSet,
+      };
+    });
 
     return folderPath;
   },
 
   renameEntry: async (oldPath, newName) => {
-    const newPath = await io.renameEntry(oldPath, newName);
+    const parent = await dirname(oldPath);
+    const newPath = await join(parent, newName);
 
-    set((state) => ({
-      entries: sortEntries(
-        renameInTree(state.entries, oldPath, newPath, newName),
-      ),
-      currentFilePath:
-        state.currentFilePath === oldPath ? newPath : state.currentFilePath,
-    }));
+    if (get().pathSet.has(newPath)) return oldPath;
+
+    const success = await io.renameEntry(oldPath, newPath);
+    if (!success) return oldPath;
+
+    set((state) => {
+      const updatedEntries = renameInTree(
+        state.entries,
+        oldPath,
+        newPath,
+        newName,
+      );
+      return {
+        entries: updatedEntries,
+        pathSet: buildPathSet(updatedEntries),
+      };
+    });
 
     return newPath;
   },
@@ -192,11 +145,22 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
   deleteEntry: async (path, isDirectory) => {
     await io.deleteEntry(path, isDirectory);
 
-    set((state) => ({
-      entries: removeFromTree(state.entries, path),
-      currentFilePath:
-        state.currentFilePath === path ? null : state.currentFilePath,
-    }));
+    set((state) => {
+      const newEntries = removeFromTree(state.entries, path);
+      if (!isDirectory) {
+        const newPathSet = new Set(state.pathSet);
+        newPathSet.delete(path);
+
+        return {
+          entries: newEntries,
+          pathSet: newPathSet,
+        };
+      }
+      return {
+        entries: newEntries,
+        pathSet: buildPathSet(newEntries),
+      };
+    });
   },
 
   refreshTree: async () => {
@@ -204,7 +168,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
     if (!currentDir) return;
 
     const tree = await io.buildTree(currentDir);
-    set({ entries: tree });
+    set({ entries: tree, pathSet: buildPathSet(tree) });
   },
 }));
 

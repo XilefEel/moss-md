@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/core";
-import { dirname, join } from "@tauri-apps/api/path";
 import { create, mkdir, remove, rename } from "@tauri-apps/plugin-fs";
 import { Entry, SearchResult } from "./types";
 
@@ -23,21 +22,18 @@ export const createFolder = async (folderPath: string): Promise<boolean> => {
   }
 };
 
-export async function renameEntry(
+export const renameEntry = async (
   oldPath: string,
-  newName: string,
-): Promise<string> {
+  newPath: string,
+): Promise<boolean> => {
   try {
-    const parent = await dirname(oldPath);
-    const newPath = await join(parent, newName);
     await rename(oldPath, newPath);
-    return newPath;
+    return true;
   } catch (error) {
     console.error("Error renaming entry:", error);
-    return oldPath;
+    return false;
   }
-}
-
+};
 export async function deleteEntry(
   path: string,
   isDirectory: boolean,
