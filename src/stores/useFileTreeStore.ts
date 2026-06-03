@@ -78,6 +78,7 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
           newFile,
         ),
         pathSet: newPathSet,
+        currentFilePath: filePath,
       };
     });
 

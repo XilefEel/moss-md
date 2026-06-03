@@ -5,7 +5,7 @@ export function useInlineEdit({
   onSave,
 }: {
   initialValue: string;
-  onSave: (value: string) => Promise<void> | void;
+  onSave: (value: string) => Promise<boolean> | boolean;
 }) {
   const [value, setValue] = useState(initialValue);
   const [isEditing, setIsEditing] = useState(false);
@@ -26,7 +26,8 @@ export function useInlineEdit({
     }
 
     if (value !== initialValue) {
-      await onSave(value);
+      const saved = await onSave(value);
+      if (!saved) setValue(initialValue);
     }
   };
 

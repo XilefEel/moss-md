@@ -41,16 +41,15 @@ export default function FolderNode({
     onSave: async (newName) => {
       const newPath = await renameEntry(entry.path, newName);
 
-      if (newPath === entry.path) {
-        setName(entry.name);
-        return;
-      }
+      if (newPath === entry.path) return false;
 
       if (currentFilePath?.startsWith(entry.path)) {
         const updatedPath = currentFilePath.replace(entry.path, newPath);
         setCurrentFilePath(updatedPath);
         await saveLastFilePath(updatedPath);
       }
+
+      return true;
     },
   });
 

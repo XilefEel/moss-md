@@ -35,15 +35,14 @@ export default function FileNode({
     onSave: async (newName) => {
       const newPath = await renameEntry(entry.path, `${newName}.md`);
 
-      if (newPath === entry.path) {
-        setName(entry.name.replace(/\.md$/, ""));
-        return;
-      }
+      if (newPath === entry.path) return false;
 
       if (isActive) {
         setCurrentFilePath(newPath);
         await saveLastFilePath(newPath);
       }
+
+      return true;
     },
   });
 
