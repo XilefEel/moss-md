@@ -24,9 +24,10 @@ export default function FolderNode({
   const openFolders = useOpenFolders();
   const newEntry = useNewEntry();
   const currentFilePath = useCurrentFilePath();
-  const { setCurrentFilePath, renameEntry } = useFileTreeActions();
+  const { setCurrentFilePath, renameEntry, setOpenFolders } =
+    useFileTreeActions();
 
-  const [isOpen, setIsOpen] = useState(() => openFolders.has(entry.path));
+  const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -40,8 +41,13 @@ export default function FolderNode({
     initialValue: entry.name,
     onSave: async (newName) => {
       const newPath = await renameEntry(entry.path, newName);
-
       if (newPath === entry.path) return false;
+
+      const updated = new Set(openFolders);
+      updated.add(newPath);
+      updated.delete(entry.path);
+
+      setOpenFolders(updated);
 
       if (currentFilePath?.startsWith(entry.path)) {
         const updatedPath = currentFilePath.replace(entry.path, newPath);
@@ -52,6 +58,17 @@ export default function FolderNode({
       return true;
     },
   });
+
+  const handleToggleFolder = () => {
+    const next = !isOpen;
+    setIsOpen(next);
+    const updated = new Set(openFolders);
+
+    if (next) updated.add(entry.path);
+    else updated.delete(entry.path);
+
+    setOpenFolders(updated);
+  };
 
   useEffect(() => {
     if (!isEditing || !inputRef.current) return;
@@ -64,6 +81,12 @@ export default function FolderNode({
     return () => clearTimeout(id);
   }, [isEditing]);
 
+  useEffect(() => {
+    if (openFolders.has(entry.path)) {
+      setIsOpen(true);
+    }
+  }, [openFolders]);
+
   return (
     <EntryContextMenu
       entry={entry}
@@ -72,9 +95,7 @@ export default function FolderNode({
     >
       <div className="mb-1">
         <button
-          onClick={() => {
-            if (!isEditing) setIsOpen(!isOpen);
-          }}
+          onClick={handleToggleFolder}
           className={cn(
             "mb-1 flex w-full items-center gap-1 truncate rounded px-2 py-0.5 text-sm transition-colors",
             "hover:bg-zinc-50 dark:hover:bg-zinc-700/50",
