@@ -1,11 +1,14 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
   FolderOpen,
+  Minus,
   Moon,
   PanelLeftOpen,
   PanelRightOpen,
+  Plus,
   Search,
   Sun,
+  X,
 } from "lucide-react";
 import { confirm } from "@tauri-apps/plugin-dialog";
 
@@ -54,19 +57,36 @@ export default function Titlebar({
       data-tauri-drag-region
       className="fixed top-0 right-0 left-0 z-50 flex h-8 flex-row items-center gap-5 bg-white px-4 select-none dark:bg-zinc-900"
     >
-      <div className="flex flex-row items-center gap-2.5">
+      <div className="group flex items-center gap-2 select-none">
         <button
           onClick={handleClose}
-          className="size-3.5 rounded-full bg-red-400 transition-colors hover:bg-red-500"
-        />
+          className="relative flex size-3.5 items-center justify-center rounded-full border border-black/10 bg-[#fc5753] transition-all hover:scale-110 active:scale-95"
+        >
+          <X
+            strokeWidth={3}
+            className="size-2 text-black/60 opacity-0 transition-opacity group-hover:opacity-100"
+          />
+        </button>
+
         <button
           onClick={() => appWindow.minimize()}
-          className="size-3.5 rounded-full bg-yellow-400 transition-colors hover:bg-yellow-500"
-        />
+          className="relative flex size-3.5 items-center justify-center rounded-full border border-black/10 bg-[#fdbc40] transition-all hover:scale-110 active:scale-95"
+        >
+          <Minus
+            strokeWidth={3}
+            className="size-2 text-black/60 opacity-0 transition-opacity group-hover:opacity-100"
+          />
+        </button>
+
         <button
           onClick={() => appWindow.toggleMaximize()}
-          className="size-3.5 rounded-full bg-green-400 transition-colors hover:bg-green-500"
-        />
+          className="relative flex size-3.5 items-center justify-center rounded-full border border-black/10 bg-[#36c84b] transition-all hover:scale-110 active:scale-95"
+        >
+          <Plus
+            strokeWidth={3}
+            className="size-2 text-black/60 opacity-0 transition-opacity group-hover:opacity-100"
+          />
+        </button>
       </div>
 
       <div className="flex items-center gap-2.5">
