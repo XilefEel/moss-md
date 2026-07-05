@@ -60,6 +60,8 @@ export default function FolderNode({
   });
 
   const handleToggleFolder = () => {
+    if (isEditing) return;
+
     const next = !isOpen;
     setIsOpen(next);
     const updated = new Set(openFolders);
@@ -134,7 +136,13 @@ export default function FolderNode({
         </button>
 
         {isOpen && entry.children && (
-          <div className="pl-5">
+          <div
+            className={cn(
+              "relative pl-6",
+              "before:absolute before:top-0 before:left-4 before:h-full",
+              "before:border-l before:border-zinc-200 dark:before:border-zinc-700",
+            )}
+          >
             {newEntry?.dirPath === entry.path && (
               <NewEntryInput type={newEntry.type} onSelectFile={onSelectFile} />
             )}
