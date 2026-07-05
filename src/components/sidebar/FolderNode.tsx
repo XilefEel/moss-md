@@ -30,6 +30,25 @@ export default function FolderNode({
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const onSave = async (newName: string) => {
+    const newPath = await renameEntry(entry.path, newName);
+    if (newPath === entry.path) return false;
+
+    const updated = new Set(openFolders);
+    updated.add(newPath);
+    updated.delete(entry.path);
+
+    setOpenFolders(updated);
+
+    if (currentFilePath?.startsWith(entry.path)) {
+      const updatedPath = currentFilePath.replace(entry.path, newPath);
+      setCurrentFilePath(updatedPath);
+      await saveLastFilePath(updatedPath);
+    }
+
+    return true;
+  };
+
   const {
     value: name,
     setValue: setName,
@@ -37,26 +56,10 @@ export default function FolderNode({
     setIsEditing,
     handleBlur,
     handleKeyDown,
+    failed,
   } = useInlineEdit({
     initialValue: entry.name,
-    onSave: async (newName) => {
-      const newPath = await renameEntry(entry.path, newName);
-      if (newPath === entry.path) return false;
-
-      const updated = new Set(openFolders);
-      updated.add(newPath);
-      updated.delete(entry.path);
-
-      setOpenFolders(updated);
-
-      if (currentFilePath?.startsWith(entry.path)) {
-        const updatedPath = currentFilePath.replace(entry.path, newPath);
-        setCurrentFilePath(updatedPath);
-        await saveLastFilePath(updatedPath);
-      }
-
-      return true;
-    },
+    onSave,
   });
 
   const handleToggleFolder = () => {
@@ -134,6 +137,15 @@ export default function FolderNode({
             />
           </div>
         </button>
+
+        {failed && (
+          <div className="mt-1 flex gap-1 px-2">
+            <span className="size-4 shrink-0" />
+            <p className="px-1 text-xs text-red-500 dark:text-red-400">
+              File or folder "{name}" already exists
+            </p>
+          </div>
+        )}
 
         {isOpen && entry.children && (
           <div

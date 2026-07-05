@@ -8,6 +8,7 @@ export function useInlineEdit({
   onSave: (value: string) => Promise<boolean> | boolean;
 }) {
   const [value, setValue] = useState(initialValue);
+  const [failed, setFailed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const shouldSaveRef = useRef(true);
 
@@ -27,11 +28,18 @@ export function useInlineEdit({
 
     if (value !== initialValue) {
       const saved = await onSave(value);
-      if (!saved) setValue(initialValue);
+      if (!saved) {
+        setFailed(true);
+        setIsEditing(true);
+      } else {
+        setFailed(false);
+      }
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    setFailed(false);
+
     if (e.key === "Enter") {
       shouldSaveRef.current = true;
       e.currentTarget.blur();
@@ -55,5 +63,6 @@ export function useInlineEdit({
     setIsEditing,
     handleBlur,
     handleKeyDown,
+    failed,
   };
 }

@@ -30,6 +30,7 @@ export default function FileNode({
     setIsEditing,
     handleBlur,
     handleKeyDown,
+    failed,
   } = useInlineEdit({
     initialValue: entry.name.replace(/\.md$/, ""),
     onSave: async (newName) => {
@@ -63,44 +64,55 @@ export default function FileNode({
       onRename={() => setIsEditing(true)}
       isDirectory={false}
     >
-      <button
-        onClick={() => {
-          if (!isEditing || isActive) onSelectFile(entry.path);
-        }}
-        className={cn(
-          "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5 transition-colors",
-          "truncate text-sm text-zinc-800 dark:text-zinc-200",
-          isActive
-            ? "bg-emerald-50 font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
-            : "hover:bg-zinc-50 hover:text-zinc-900 dark:hover:bg-zinc-700/50 dark:hover:text-zinc-100",
-        )}
-      >
-        <FileText className="size-4 shrink-0" />
-
-        <div
+      <div>
+        <button
+          onClick={() => {
+            if (!isEditing || isActive) onSelectFile(entry.path);
+          }}
           className={cn(
-            "min-w-0 flex-1 rounded text-left",
-            isEditing &&
-              "bg-zinc-50 px-1 text-zinc-800 shadow-md ring-2 ring-emerald-500 dark:bg-zinc-800 dark:text-zinc-200",
+            "mb-1 flex w-full items-center gap-1 rounded px-2 py-0.5 transition-colors",
+            "truncate text-sm text-zinc-800 dark:text-zinc-200",
+            isActive
+              ? "bg-emerald-50 font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
+              : "hover:bg-zinc-50 hover:text-zinc-900 dark:hover:bg-zinc-700/50 dark:hover:text-zinc-100",
           )}
         >
-          <input
-            ref={inputRef}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            readOnly={!isEditing}
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
+          <FileText className="size-4 shrink-0" />
+
+          <div
             className={cn(
-              "w-full truncate bg-transparent focus:outline-none",
-              !isEditing && "pointer-events-none",
+              "min-w-0 flex-1 rounded text-left",
+              isEditing &&
+                "bg-zinc-50 px-1 text-zinc-800 shadow-md ring-2 ring-emerald-500 dark:bg-zinc-800 dark:text-zinc-200",
             )}
-          />
-        </div>
-      </button>
+          >
+            <input
+              ref={inputRef}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              readOnly={!isEditing}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              className={cn(
+                "w-full truncate bg-transparent focus:outline-none",
+                !isEditing && "pointer-events-none",
+              )}
+            />
+          </div>
+        </button>
+
+        {failed && (
+          <div className="mt-1 flex gap-1 px-2">
+            <span className="size-4 shrink-0" />
+            <p className="px-1 text-xs text-red-500 dark:text-red-400">
+              File or folder "{name}" already exists
+            </p>
+          </div>
+        )}
+      </div>
     </EntryContextMenu>
   );
 }
