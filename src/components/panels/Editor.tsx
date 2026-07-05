@@ -12,13 +12,25 @@ const themeCompartment = new Compartment();
 
 const lightTheme = EditorView.theme(
   {
-    "&": { backgroundColor: "transparent" },
-    ".cm-content": { caretColor: "#71717a", color: "#3f3f46" },
-    ".cm-focused": { outline: "none" },
-    ".cm-gutters": { display: "none" },
-    "&.cm-focused .cm-cursor": { borderLeftColor: "#71717a" },
-    "&.cm-focused .cm-selectionBackground, ::selection": {
-      backgroundColor: "#e4e4e7",
+    "&": {
+      backgroundColor: "transparent",
+    },
+    ".cm-content": {
+      color: "#3f3f46",
+      caretColor: "#10b981",
+    },
+    ".cm-focused": {
+      outline: "none",
+    },
+    ".cm-gutters": {
+      display: "none",
+    },
+    "&.cm-focused .cm-cursor": {
+      borderLeftColor: "#10b981",
+    },
+    "& .cm-selectionLayer .cm-selectionBackground": {
+      backgroundColor:
+        "rgb(from var(--color-emerald-200) r g b / 0.5) !important",
     },
   },
   { dark: false },
@@ -26,13 +38,25 @@ const lightTheme = EditorView.theme(
 
 const darkTheme = EditorView.theme(
   {
-    "&": { backgroundColor: "transparent" },
-    ".cm-content": { caretColor: "#a1a1aa", color: "#d4d4d8" },
-    ".cm-focused": { outline: "none" },
-    ".cm-gutters": { display: "none" },
-    "&.cm-focused .cm-cursor": { borderLeftColor: "#a1a1aa" },
-    "&.cm-focused .cm-selectionBackground, ::selection": {
-      backgroundColor: "#3f3f46",
+    "&": {
+      backgroundColor: "transparent",
+    },
+    ".cm-content": {
+      color: "#d4d4d8",
+      caretColor: "#34d399",
+    },
+    ".cm-focused": {
+      outline: "none",
+    },
+    ".cm-gutters": {
+      display: "none",
+    },
+    "&.cm-focused .cm-cursor": {
+      borderLeftColor: "#34d399",
+    },
+    "& .cm-selectionLayer .cm-selectionBackground": {
+      backgroundColor:
+        "rgb(from var(--color-emerald-800) r g b / 0.5) !important",
     },
   },
   { dark: true },
@@ -78,10 +102,6 @@ export default function Editor({
           minimalSetup,
           EditorView.lineWrapping,
           markdown({ codeLanguages: languages }),
-          themeCompartment.of([
-            isDark ? darkTheme : lightTheme,
-            syntaxHighlighting(isDark ? darkHighlight : lightHighlight),
-          ]),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) onChange(update.state.doc.toString());
           }),
@@ -99,6 +119,10 @@ export default function Editor({
             replace: "Replace",
             "replace all": "Replace All",
           }),
+          themeCompartment.of([
+            syntaxHighlighting(isDark ? darkHighlight : lightHighlight),
+            isDark ? darkTheme : lightTheme,
+          ]),
         ],
       }),
       parent: containerRef.current,

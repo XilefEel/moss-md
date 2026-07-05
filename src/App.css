@@ -42,6 +42,16 @@
   background: transparent;
 }
 
+::selection {
+  background-color: rgb(from var(--color-emerald-200) r g b / 0.5);
+  color: inherit;
+}
+
+.dark ::selection {
+  background-color: rgb(from var(--color-emerald-800) r g b / 0.5);
+  color: inherit;
+}
+
 .prose {
   --tw-prose-body: var(--color-zinc-700);
   --tw-prose-headings: var(--color-zinc-900);

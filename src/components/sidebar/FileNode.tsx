@@ -23,6 +23,19 @@ export default function FileNode({
   const inputRef = useRef<HTMLInputElement>(null);
   const isActive = currentFile === entry.path;
 
+  const onSave = async (newName: string) => {
+    const newPath = await renameEntry(entry.path, `${newName}.md`);
+
+    if (newPath === entry.path) return false;
+
+    if (isActive) {
+      setCurrentFilePath(newPath);
+      await saveLastFilePath(newPath);
+    }
+
+    return true;
+  };
+
   const {
     value: name,
     setValue: setName,
@@ -33,18 +46,7 @@ export default function FileNode({
     failed,
   } = useInlineEdit({
     initialValue: entry.name.replace(/\.md$/, ""),
-    onSave: async (newName) => {
-      const newPath = await renameEntry(entry.path, `${newName}.md`);
-
-      if (newPath === entry.path) return false;
-
-      if (isActive) {
-        setCurrentFilePath(newPath);
-        await saveLastFilePath(newPath);
-      }
-
-      return true;
-    },
+    onSave,
   });
 
   useEffect(() => {
