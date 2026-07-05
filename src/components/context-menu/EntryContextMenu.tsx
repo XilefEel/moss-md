@@ -1,11 +1,20 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { cn } from "../../lib/utils";
-import { FilePlus, FolderPlus, PencilLine, Trash2 } from "lucide-react";
+import {
+  Copy,
+  FilePlus,
+  FolderOpen,
+  FolderPlus,
+  PencilLine,
+  SquareArrowOutUpRight,
+  Trash2,
+} from "lucide-react";
 import ContextMenuItem from "./ContextMenuItem";
 import { useFileTreeActions } from "../../stores/useFileTreeStore";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { dirname } from "@tauri-apps/api/path";
 import { Entry } from "../../lib/types";
+import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
 
 export default function FileTreeContextMenu({
   children,
@@ -37,6 +46,16 @@ export default function FileTreeContextMenu({
     await deleteEntry(entry.path, entry.isDirectory);
     refreshTree();
   };
+
+  const handleCopyAbsolutePath = async () => {
+    await navigator.clipboard.writeText(entry.path);
+  };
+
+  const handleRevealInFileExplorer = async () => {
+    await revealItemInDir(entry.path);
+  };
+
+  const handleOpenInExternalEditor = () => openPath(entry.path);
 
   return (
     <ContextMenu.Root>
@@ -71,6 +90,28 @@ export default function FileTreeContextMenu({
             Icon={PencilLine}
             label={`Rename ${isDirectory ? "Folder" : "File"}`}
           />
+
+          <ContextMenuItem
+            onSelect={handleCopyAbsolutePath}
+            Icon={Copy}
+            label={"Copy Absolute Path"}
+          />
+
+          <ContextMenuItem
+            onSelect={handleRevealInFileExplorer}
+            Icon={FolderOpen}
+            label={"Reveal in File Explorer"}
+          />
+
+          {!entry.isDirectory && (
+            <ContextMenuItem
+              onSelect={handleOpenInExternalEditor}
+              Icon={SquareArrowOutUpRight}
+              label={"Open in External Editor"}
+            />
+          )}
+
+          <ContextMenu.Separator className="h-px border-t border-t-zinc-200 dark:border-t-zinc-700" />
 
           <ContextMenuItem
             onSelect={handleDelete}
