@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import Editor from "./components/panels/Editor";
@@ -10,7 +10,6 @@ import {
   Group,
   Panel,
   PanelImperativeHandle,
-  PanelSize,
   Separator,
   useDefaultLayout,
 } from "react-resizable-panels";
@@ -33,6 +32,7 @@ import {
 import SearchModal from "./components/modals/SearchModal";
 import { useState } from "react";
 import { useFileDrop } from "./hooks/useFileDrop";
+import { usePanelSync } from "./hooks/usePanelSync";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -111,16 +111,6 @@ export default function App() {
     [setCurrentFilePath, setContent],
   );
 
-  const handleSidebarResize = (size: PanelSize) => {
-    const isOpen = size.asPercentage !== 0;
-    setIsSidebarOpen(isOpen);
-  };
-
-  const handleEditorResize = (size: PanelSize) => {
-    const isOpen = size.asPercentage !== 0;
-    setIsRightbarOpen(isOpen);
-  };
-
   const { isSearchOpen, setIsSearchOpen } = useKeyboardShortcuts({
     handleSave,
     handleOpen: handleOpenDirectory,
@@ -131,24 +121,21 @@ export default function App() {
 
   const isDragging = useFileDrop(handleSelectFile);
 
+  const { handleSidebarResize, handleEditorResize } = usePanelSync({
+    sidebarRef,
+    editorRef,
+    isSidebarOpen,
+    isRightbarOpen,
+    setIsSidebarOpen,
+    setIsRightbarOpen,
+  });
+
   useRestoreSession({
     setContent,
     savedContentRef,
     setIsSidebarOpen,
     setMode,
   });
-
-  useEffect(() => {
-    if (isSidebarOpen === null) return;
-    if (isSidebarOpen) sidebarRef.current?.expand();
-    else sidebarRef.current?.collapse();
-  }, [isSidebarOpen]);
-
-  useEffect(() => {
-    if (isRightbarOpen === null) return;
-    if (isRightbarOpen) editorRef.current?.expand();
-    else editorRef.current?.collapse();
-  }, [isRightbarOpen]);
 
   return (
     <div
