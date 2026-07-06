@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import Editor from "./components/panels/Editor";
@@ -31,13 +31,11 @@ import {
   useUIActions,
 } from "./stores/useUIStore";
 import SearchModal from "./components/modals/SearchModal";
-import { listen } from "@tauri-apps/api/event";
 import { useState } from "react";
+import { useFileDrop } from "./hooks/useFileDrop";
 
 export default function App() {
   const [content, setContent] = useState("");
-  const [isDragging, setIsDragging] = useState(false);
-
   const sidebarRef = useRef<PanelImperativeHandle>(null);
   const editorRef = useRef<PanelImperativeHandle>(null);
   const savedContentRef = useRef<string>("");
@@ -56,6 +54,8 @@ export default function App() {
     toggleMode,
     toggleSidebar,
   } = useUIActions();
+
+  const { isDark, toggleTheme } = useTheme();
 
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
     id: "moss-layout",
@@ -97,16 +97,19 @@ export default function App() {
     await Promise.all([saveLastDir(dir), saveLastFilePath("")]);
   };
 
-  const handleSelectFile = async (path: string) => {
-    const text = await readTextFile(path);
-    setCurrentFilePath(path);
+  const handleSelectFile = useCallback(
+    async (path: string) => {
+      const text = await readTextFile(path);
+      setCurrentFilePath(path);
 
-    const normalized = text.replace(/\r\n/g, "\n");
-    setContent(normalized);
-    savedContentRef.current = normalized;
+      const normalized = text.replace(/\r\n/g, "\n");
+      setContent(normalized);
+      savedContentRef.current = normalized;
 
-    await saveLastFilePath(path);
-  };
+      await saveLastFilePath(path);
+    },
+    [setCurrentFilePath, setContent],
+  );
 
   const handleSidebarResize = (size: PanelSize) => {
     const isOpen = size.asPercentage !== 0;
@@ -118,21 +121,21 @@ export default function App() {
     setIsRightbarOpen(isOpen);
   };
 
-  const { isDark, toggleTheme } = useTheme();
-
-  useRestoreSession({
-    setContent,
-    savedContentRef,
-    setIsSidebarOpen,
-    setMode,
-  });
-
   const { isSearchOpen, setIsSearchOpen } = useKeyboardShortcuts({
     handleSave,
     handleOpen: handleOpenDirectory,
     toggleTheme,
     handleToggleMode: toggleMode,
     handleToggleSidebar: toggleSidebar,
+  });
+
+  const isDragging = useFileDrop(handleSelectFile);
+
+  useRestoreSession({
+    setContent,
+    savedContentRef,
+    setIsSidebarOpen,
+    setMode,
   });
 
   useEffect(() => {
@@ -146,31 +149,6 @@ export default function App() {
     if (isRightbarOpen) editorRef.current?.expand();
     else editorRef.current?.collapse();
   }, [isRightbarOpen]);
-
-  useEffect(() => {
-    const unlistenDrop = listen("tauri://drag-drop", async (event: any) => {
-      setIsDragging(false);
-
-      const paths = event.payload.paths as string[];
-      const mdFile = paths.find((p: string) => p.endsWith(".md"));
-      if (!mdFile) return;
-
-      await handleSelectFile(mdFile);
-    });
-
-    const unlistenEnter = listen("tauri://drag-enter", () =>
-      setIsDragging(true),
-    );
-    const unlistenLeave = listen("tauri://drag-leave", () =>
-      setIsDragging(false),
-    );
-
-    return () => {
-      unlistenDrop.then((fn) => fn());
-      unlistenEnter.then((fn) => fn());
-      unlistenLeave.then((fn) => fn());
-    };
-  }, []);
 
   return (
     <div
