@@ -1,10 +1,12 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
+  Eye,
   FolderOpen,
   Minus,
   Moon,
   PanelLeftOpen,
   PanelRightOpen,
+  Pencil,
   Plus,
   Search,
   Sun,
@@ -17,16 +19,19 @@ const appWindow = getCurrentWindow();
 export default function Titlebar({
   mode,
   isSidebarOpen,
+  isRightbarOpen,
   isDark,
   isDirty,
   onOpen,
   onToggleMode,
   onToggleSidebar,
+  onToggleRightbar,
   onToggleTheme,
   onToggleSearch,
 }: {
   mode: "view" | "edit";
   isSidebarOpen: boolean;
+  isRightbarOpen: boolean;
   isDark: boolean;
   isDirty: boolean;
   onOpen: () => void;
@@ -34,6 +39,7 @@ export default function Titlebar({
   onToggleMode: () => void;
   onToggleSidebar: () => void;
   onToggleTheme: () => void;
+  onToggleRightbar: () => void;
   onToggleSearch: () => void;
 }) {
   const handleClose = async () => {
@@ -137,9 +143,20 @@ export default function Titlebar({
           className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
         >
           {mode === "view" ? (
-            <PanelRightOpen className="size-4 shrink-0" />
+            <Pencil className="size-4 shrink-0" />
           ) : (
+            <Eye className="size-4 shrink-0" />
+          )}
+        </button>
+
+        <button
+          onClick={onToggleRightbar}
+          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+        >
+          {isRightbarOpen ? (
             <PanelLeftOpen className="size-4 shrink-0" />
+          ) : (
+            <PanelRightOpen className="size-4 shrink-0" />
           )}
         </button>
       </div>

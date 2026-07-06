@@ -47,14 +47,22 @@ export async function getIsSidebarOpen(): Promise<boolean | null> {
   return getItem<boolean>("isSidebarOpen");
 }
 
-export async function saveIsSidebarOpen(path: boolean) {
-  return setItem("isSidebarOpen", path);
+export async function saveIsSidebarOpen(val: boolean) {
+  return setItem("isSidebarOpen", val);
+}
+
+export async function getIsRightbarOpen(): Promise<boolean | null> {
+  return getItem<boolean>("isRightbarOpen");
+}
+
+export async function saveIsRightbarOpen(val: boolean) {
+  return setItem("isRightbarOpen", val);
 }
 
 export async function getViewMode(): Promise<"view" | "edit" | null> {
   return getItem<"view" | "edit">("viewMode");
 }
 
-export async function saveViewMode(path: string) {
-  return setItem("viewMode", path);
+export async function saveViewMode(val: string) {
+  return setItem("viewMode", val);
 }

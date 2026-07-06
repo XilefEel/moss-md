@@ -10,6 +10,7 @@ import {
   saveLastDir,
   saveLastFilePath,
   saveViewMode,
+  saveIsRightbarOpen,
 } from "./lib/storage";
 import {
   Group,
@@ -38,7 +39,7 @@ export default function App() {
 
   const [mode, setMode] = useState<"view" | "edit" | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean | null>(null);
-
+  const [isRightbarOpen, setIsRightbarOpen] = useState<boolean | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const sidebarRef = useRef<PanelImperativeHandle>(null);
@@ -111,6 +112,12 @@ export default function App() {
     saveIsSidebarOpen(next);
   };
 
+  const handleToggleRightbar = () => {
+    const next = !isRightbarOpen;
+    setIsRightbarOpen(next);
+    saveIsRightbarOpen(next);
+  };
+
   const handleSidebarResize = (size: PanelSize) => {
     const isOpen = size.asPercentage !== 0;
     setIsSidebarOpen(isOpen);
@@ -118,9 +125,9 @@ export default function App() {
   };
 
   const handleEditorResize = (size: PanelSize) => {
-    const isEdit = size.asPercentage !== 0;
-    setMode(isEdit ? "edit" : "view");
-    saveViewMode(isEdit ? "edit" : "view");
+    const isOpen = size.asPercentage !== 0;
+    setIsRightbarOpen(isOpen);
+    saveIsRightbarOpen(isOpen);
   };
 
   const { isDark, toggleTheme } = useTheme();
@@ -147,10 +154,10 @@ export default function App() {
   }, [isSidebarOpen]);
 
   useEffect(() => {
-    if (mode === null) return;
-    if (mode === "edit") editorRef.current?.expand();
+    if (isRightbarOpen === null) return;
+    if (isRightbarOpen) editorRef.current?.expand();
     else editorRef.current?.collapse();
-  }, [mode]);
+  }, [isRightbarOpen]);
 
   useEffect(() => {
     const unlistenDrop = listen("tauri://drag-drop", async (event: any) => {
@@ -189,12 +196,14 @@ export default function App() {
       <Titlebar
         mode={mode!}
         isSidebarOpen={isSidebarOpen!}
+        isRightbarOpen={isRightbarOpen!}
         isDark={isDark}
         isDirty={isDirty}
         onOpen={handleOpenDirectory}
         onSave={handleSave}
         onToggleMode={handleToggleMode}
         onToggleSidebar={handleToggleSidebar}
+        onToggleRightbar={handleToggleRightbar}
         onToggleTheme={toggleTheme}
         onToggleSearch={() => setIsSearchOpen((open) => !open)}
       />
@@ -220,13 +229,21 @@ export default function App() {
           />
 
           <Panel id="viewer" className="mt-8 mb-6 px-8" minSize="15%">
-            <Viewer content={content} />
+            {mode === "view" ? (
+              <Viewer content={content} />
+            ) : (
+              <Editor
+                content={content}
+                onChange={handleContentChange}
+                isDark={isDark}
+              />
+            )}
           </Panel>
 
           <Separator
             className={cn(
               "w-px cursor-col-resize bg-zinc-200 hover:bg-emerald-400 dark:bg-zinc-700 dark:hover:bg-emerald-500",
-              mode === "view" && "hidden",
+              !isRightbarOpen && "hidden",
             )}
           />
 
@@ -238,11 +255,15 @@ export default function App() {
             collapsible
             onResize={handleEditorResize}
           >
-            <Editor
-              content={content}
-              onChange={handleContentChange}
-              isDark={isDark}
-            />
+            {mode === "edit" ? (
+              <Viewer content={content} />
+            ) : (
+              <Editor
+                content={content}
+                onChange={handleContentChange}
+                isDark={isDark}
+              />
+            )}
           </Panel>
         </Group>
       </div>
