@@ -1,17 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import Editor from "./components/panels/Editor";
 import Viewer from "./components/panels/Viewer";
 import "./App.css";
 import Titlebar from "./components/Titlebar";
-import {
-  saveIsSidebarOpen,
-  saveLastDir,
-  saveLastFilePath,
-  saveViewMode,
-  saveIsRightbarOpen,
-} from "./lib/storage";
+import { saveLastDir, saveLastFilePath } from "./lib/storage";
 import {
   Group,
   Panel,
@@ -30,16 +24,18 @@ import {
   useCurrentFilePath,
   useFileTreeActions,
 } from "./stores/useFileTreeStore";
+import {
+  useMode,
+  useIsSidebarOpen,
+  useIsRightbarOpen,
+  useUIActions,
+} from "./stores/useUIStore";
 import SearchModal from "./components/modals/SearchModal";
 import { listen } from "@tauri-apps/api/event";
+import { useState } from "react";
 
 export default function App() {
   const [content, setContent] = useState("");
-  const [isDirty, setIsDirty] = useState(false);
-
-  const [mode, setMode] = useState<"view" | "edit" | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean | null>(null);
-  const [isRightbarOpen, setIsRightbarOpen] = useState<boolean | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const sidebarRef = useRef<PanelImperativeHandle>(null);
@@ -48,6 +44,18 @@ export default function App() {
 
   const currentFilePath = useCurrentFilePath();
   const { setCurrentFilePath, setCurrentDir } = useFileTreeActions();
+
+  const mode = useMode();
+  const isSidebarOpen = useIsSidebarOpen();
+  const isRightbarOpen = useIsRightbarOpen();
+  const {
+    setMode,
+    setIsSidebarOpen,
+    setIsRightbarOpen,
+    setIsDirty,
+    toggleMode,
+    toggleSidebar,
+  } = useUIActions();
 
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
     id: "moss-layout",
@@ -100,34 +108,14 @@ export default function App() {
     await saveLastFilePath(path);
   };
 
-  const handleToggleMode = () => {
-    const next = mode === "view" ? "edit" : "view";
-    setMode(next);
-    saveViewMode(next);
-  };
-
-  const handleToggleSidebar = () => {
-    const next = !isSidebarOpen;
-    setIsSidebarOpen(next);
-    saveIsSidebarOpen(next);
-  };
-
-  const handleToggleRightbar = () => {
-    const next = !isRightbarOpen;
-    setIsRightbarOpen(next);
-    saveIsRightbarOpen(next);
-  };
-
   const handleSidebarResize = (size: PanelSize) => {
     const isOpen = size.asPercentage !== 0;
     setIsSidebarOpen(isOpen);
-    saveIsSidebarOpen(isOpen);
   };
 
   const handleEditorResize = (size: PanelSize) => {
     const isOpen = size.asPercentage !== 0;
     setIsRightbarOpen(isOpen);
-    saveIsRightbarOpen(isOpen);
   };
 
   const { isDark, toggleTheme } = useTheme();
@@ -143,8 +131,8 @@ export default function App() {
     handleSave,
     handleOpen: handleOpenDirectory,
     toggleTheme,
-    handleToggleMode,
-    handleToggleSidebar,
+    handleToggleMode: toggleMode,
+    handleToggleSidebar: toggleSidebar,
   });
 
   useEffect(() => {
@@ -194,16 +182,8 @@ export default function App() {
       )}
 
       <Titlebar
-        mode={mode!}
-        isSidebarOpen={isSidebarOpen!}
-        isRightbarOpen={isRightbarOpen!}
         isDark={isDark}
-        isDirty={isDirty}
         onOpen={handleOpenDirectory}
-        onSave={handleSave}
-        onToggleMode={handleToggleMode}
-        onToggleSidebar={handleToggleSidebar}
-        onToggleRightbar={handleToggleRightbar}
         onToggleTheme={toggleTheme}
         onToggleSearch={() => setIsSearchOpen((open) => !open)}
       />
