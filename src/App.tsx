@@ -20,6 +20,7 @@ import BottomBar from "./components/BottomBar";
 import useTheme from "./hooks/useTheme";
 import { useRestoreSession } from "./hooks/useRestoreSession";
 import {
+  useCurrentDir,
   useCurrentFilePath,
   useFileTreeActions,
 } from "./stores/useFileTreeStore";
@@ -33,6 +34,7 @@ import SearchModal from "./components/modals/SearchModal";
 import { useState } from "react";
 import { useFileDrop } from "./hooks/useFileDrop";
 import { usePanelSync } from "./hooks/usePanelSync";
+import { useDirWatcher } from "./hooks/useDirWatch";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -41,7 +43,9 @@ export default function App() {
   const savedContentRef = useRef<string>("");
 
   const currentFilePath = useCurrentFilePath();
-  const { setCurrentFilePath, setCurrentDir } = useFileTreeActions();
+  const currentDir = useCurrentDir();
+  const { setCurrentFilePath, setCurrentDir, refreshTree } =
+    useFileTreeActions();
 
   const mode = useMode();
   const isSidebarOpen = useIsSidebarOpen();
@@ -136,6 +140,8 @@ export default function App() {
     setIsSidebarOpen,
     setMode,
   });
+
+  useDirWatcher(currentDir, refreshTree);
 
   return (
     <div
