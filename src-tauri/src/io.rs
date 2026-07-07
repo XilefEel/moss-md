@@ -31,7 +31,7 @@ fn read_dir(dir: &Path) -> std::io::Result<Vec<Entry>> {
 
         let name = entry.file_name().to_string_lossy().into_owned();
         let path_str = path.to_string_lossy().into_owned();
-        let is_dir = path.is_dir();
+        let is_dir = entry.file_type()?.is_dir();
 
         if name.starts_with('.') {
             continue;

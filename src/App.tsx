@@ -34,7 +34,7 @@ import SearchModal from "./components/modals/SearchModal";
 import { useState } from "react";
 import { useFileDrop } from "./hooks/useFileDrop";
 import { usePanelSync } from "./hooks/usePanelSync";
-import { useDirWatcher } from "./hooks/useDirWatch";
+import { useDirWatcher } from "./hooks/useDirWatcher";
 
 export default function App() {
   const [content, setContent] = useState("");
