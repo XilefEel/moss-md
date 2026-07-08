@@ -8,7 +8,7 @@ import {
 } from "../../stores/useFileTreeStore";
 import { NewEntryInput } from "./NewEntryInput";
 import SidebarContextMenu from "../context-menu/SidebarContextMenu";
-import { DragDropProvider } from "@dnd-kit/react";
+import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 
 export default function Sidebar({
   onSelectFile,
@@ -20,10 +20,6 @@ export default function Sidebar({
   const currentDir = useCurrentDir();
 
   const { refreshTree, moveEntry } = useFileTreeActions();
-
-  useEffect(() => {
-    refreshTree();
-  }, [currentDir, refreshTree]);
 
   const handleDragEnd = async (event: any) => {
     const { operation, canceled } = event;
@@ -37,27 +33,50 @@ export default function Sidebar({
     await moveEntry(sourcePath, resolvedDest);
   };
 
+  useEffect(() => {
+    refreshTree();
+  }, [currentDir, refreshTree]);
+
   return (
     <SidebarContextMenu>
       <DragDropProvider onDragEnd={handleDragEnd}>
-        <div className="overflow-auto px-8">
-          {currentDir ? (
-            <>
-              {newEntry?.dirPath === currentDir && (
-                <NewEntryInput
-                  type={newEntry.type}
-                  onSelectFile={onSelectFile}
-                />
-              )}
-              <FileTree entries={entries} onSelectFile={onSelectFile} />
-            </>
-          ) : (
-            <p className="text-sm text-zinc-400 dark:text-zinc-500">
-              No directory selected
-            </p>
-          )}
-        </div>
+        <RootDropZone dirPath={currentDir}>
+          <div className="overflow-auto px-8">
+            {currentDir ? (
+              <>
+                {newEntry?.dirPath === currentDir && (
+                  <NewEntryInput
+                    type={newEntry.type}
+                    onSelectFile={onSelectFile}
+                  />
+                )}
+                <FileTree entries={entries} onSelectFile={onSelectFile} />
+              </>
+            ) : (
+              <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                No directory selected
+              </p>
+            )}
+          </div>
+        </RootDropZone>
       </DragDropProvider>
     </SidebarContextMenu>
+  );
+}
+
+function RootDropZone({
+  dirPath,
+  children,
+}: {
+  dirPath: string | null;
+  children: React.ReactNode;
+}) {
+  const { ref } = useDroppable({ id: "__root__" });
+  if (!dirPath) return <>{children}</>;
+
+  return (
+    <div ref={ref} className="flex h-full min-h-0 flex-col">
+      {children}
+    </div>
   );
 }
