@@ -13,6 +13,7 @@ import { Entry } from "../../lib/types";
 import { saveLastFilePath } from "../../lib/storage";
 import { useInlineEdit } from "../../hooks/useInlineEdit";
 import { NewEntryInput } from "./NewEntryInput";
+import { useDraggable, useDroppable } from "@dnd-kit/react";
 
 export default function FolderNode({
   entry,
@@ -29,6 +30,14 @@ export default function FolderNode({
 
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { ref: dragRef } = useDraggable({ id: entry.path });
+  const { ref: dropRef, isDropTarget } = useDroppable({ id: entry.path });
+
+  const setRefs = (node: HTMLElement | null) => {
+    dragRef(node);
+    dropRef(node);
+  };
 
   const onSave = async (newName: string) => {
     const newPath = await renameEntry(entry.path, newName);
@@ -98,8 +107,9 @@ export default function FolderNode({
       onRename={() => setIsEditing(true)}
       isDirectory
     >
-      <div className="mb-1">
+      <div className={cn("mb-1 rounded", isDropTarget && "bg-emerald-50")}>
         <button
+          ref={setRefs}
           onClick={handleToggleFolder}
           className={cn(
             "mb-1 flex w-full items-center gap-1 truncate rounded px-2 py-0.5 text-sm transition-colors",

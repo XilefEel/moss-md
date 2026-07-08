@@ -9,6 +9,7 @@ import EntryContextMenu from "../context-menu/EntryContextMenu";
 import { Entry } from "../../lib/types";
 import { saveLastFilePath } from "../../lib/storage";
 import { useInlineEdit } from "../../hooks/useInlineEdit";
+import { useDraggable } from "@dnd-kit/react";
 
 export default function FileNode({
   entry,
@@ -22,6 +23,10 @@ export default function FileNode({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const isActive = currentFile === entry.path;
+
+  const { ref } = useDraggable({
+    id: entry.path,
+  });
 
   const onSave = async (newName: string) => {
     const newPath = await renameEntry(entry.path, `${newName}.md`);
@@ -68,6 +73,7 @@ export default function FileNode({
     >
       <div>
         <button
+          ref={ref}
           onClick={() => {
             if (!isEditing || isActive) onSelectFile(entry.path);
           }}

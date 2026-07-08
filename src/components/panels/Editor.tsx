@@ -7,6 +7,7 @@ import { languages } from "@codemirror/language-data";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import { search, searchKeymap } from "@codemirror/search";
+import { placeholder } from "@codemirror/view";
 
 const themeCompartment = new Compartment();
 
@@ -31,6 +32,10 @@ const lightTheme = EditorView.theme(
     "& .cm-selectionLayer .cm-selectionBackground": {
       backgroundColor:
         "rgb(from var(--color-emerald-200) r g b / 0.5) !important",
+    },
+    ".cm-placeholder": {
+      color: "#a1a1aa",
+      fontStyle: "italic",
     },
   },
   { dark: false },
@@ -57,6 +62,10 @@ const darkTheme = EditorView.theme(
     "& .cm-selectionLayer .cm-selectionBackground": {
       backgroundColor:
         "rgb(from var(--color-emerald-800) r g b / 0.5) !important",
+    },
+    ".cm-placeholder": {
+      color: "#71717a",
+      fontStyle: "italic",
     },
   },
   { dark: true },
@@ -102,6 +111,7 @@ export default function Editor({
           minimalSetup,
           EditorView.lineWrapping,
           markdown({ codeLanguages: languages }),
+          placeholder("Start writing..."),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) onChange(update.state.doc.toString());
           }),

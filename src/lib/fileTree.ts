@@ -109,3 +109,17 @@ export const buildPathSet = (entries: Entry[]): Set<string> => {
 
   return paths;
 };
+
+export const findEntryInTree = (
+  entries: Entry[],
+  path: string,
+): Entry | null => {
+  for (const e of entries) {
+    if (e.path === path) return e;
+    if (e.isDirectory && path.startsWith(e.path) && e.children) {
+      const found = findEntryInTree(e.children, path);
+      if (found) return found;
+    }
+  }
+  return null;
+};

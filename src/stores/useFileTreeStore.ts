@@ -8,6 +8,8 @@ import {
   renameInTree,
   buildPathSet,
   removeFromTree,
+  updateChildrenPaths,
+  findEntryInTree,
 } from "../lib/fileTree";
 
 type FileTreeStore = {
@@ -30,6 +32,7 @@ type FileTreeStore = {
   createFolder: (dirPath: string, name: string) => Promise<string | null>;
   renameEntry: (oldPath: string, newName: string) => Promise<string>;
   deleteEntry: (path: string, isDirectory: boolean) => Promise<void>;
+  moveEntry: (oldPath: string, newPath: string) => Promise<string>;
 
   refreshTree: () => void;
 };
@@ -164,6 +167,51 @@ const useFileTreeStore = create<FileTreeStore>((set, get) => ({
     });
   },
 
+  moveEntry: async (sourcePath: string, destDirPath: string) => {
+    const entry = findEntryInTree(get().entries, sourcePath);
+    if (!entry) return sourcePath;
+
+    const newPath = await join(destDirPath, entry.name);
+
+    if (sourcePath === newPath) return sourcePath;
+    if (get().pathSet.has(newPath)) return sourcePath;
+    if (entry.isDirectory && destDirPath.startsWith(sourcePath))
+      return sourcePath;
+
+    const success = await io.renameEntry(sourcePath, newPath);
+    if (!success) return sourcePath;
+
+    set((state) => {
+      const withoutSource = removeFromTree(state.entries, sourcePath);
+
+      const movedEntry: Entry = {
+        ...entry,
+        path: newPath,
+        children: entry.children
+          ? updateChildrenPaths(entry.children, sourcePath, newPath)
+          : entry.children,
+      };
+
+      const withMoved = insertIntoTree(
+        withoutSource,
+        state.currentDir!,
+        destDirPath,
+        movedEntry,
+      );
+
+      return {
+        entries: withMoved,
+        pathSet: buildPathSet(withMoved),
+        currentFilePath:
+          state.currentFilePath === sourcePath
+            ? newPath
+            : state.currentFilePath,
+      };
+    });
+
+    return newPath;
+  },
+
   refreshTree: async () => {
     const currentDir = get().currentDir;
     if (!currentDir) return;
@@ -199,6 +247,7 @@ export const useFileTreeActions = () =>
       createFolder: state.createFolder,
       renameEntry: state.renameEntry,
       deleteEntry: state.deleteEntry,
+      moveEntry: state.moveEntry,
 
       refreshTree: state.refreshTree,
     })),
