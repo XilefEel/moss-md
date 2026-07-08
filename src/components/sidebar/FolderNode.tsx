@@ -107,7 +107,12 @@ export default function FolderNode({
       onRename={() => setIsEditing(true)}
       isDirectory
     >
-      <div className={cn("mb-1 rounded", isDropTarget && "bg-emerald-50")}>
+      <div
+        className={cn(
+          "mb-1 rounded",
+          isDropTarget && "bg-emerald-50/40 dark:bg-emerald-900/20",
+        )}
+      >
         <button
           ref={setRefs}
           onClick={handleToggleFolder}

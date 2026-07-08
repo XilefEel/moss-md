@@ -9,6 +9,11 @@ import {
 import { NewEntryInput } from "./NewEntryInput";
 import SidebarContextMenu from "../context-menu/SidebarContextMenu";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
+import { type ComponentProps } from "react";
+
+type OnDragEnd = NonNullable<
+  ComponentProps<typeof DragDropProvider>["onDragEnd"]
+>;
 
 export default function Sidebar({
   onSelectFile,
@@ -21,11 +26,11 @@ export default function Sidebar({
 
   const { refreshTree, moveEntry } = useFileTreeActions();
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd: OnDragEnd = async (event) => {
     const { operation, canceled } = event;
     if (canceled || !operation.target || !currentDir) return;
 
-    const sourcePath = operation.source.id as string;
+    const sourcePath = operation.source!.id as string;
     const destId = operation.target.id as string;
     const resolvedDest = destId === "__root__" ? currentDir : destId;
 
