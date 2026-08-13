@@ -35,6 +35,7 @@ import { useState } from "react";
 import { useFileDrop } from "./hooks/useFileDrop";
 import { usePanelSync } from "./hooks/usePanelSync";
 import { useDirWatcher } from "./hooks/useDirWatcher";
+import { useExternalFileOpen } from "./hooks/useExternalFileOpen";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -114,6 +115,8 @@ export default function App() {
     },
     [setCurrentFilePath, setContent],
   );
+
+  useExternalFileOpen(handleSelectFile);
 
   const { isSearchOpen, setIsSearchOpen } = useKeyboardShortcuts({
     handleSave,
