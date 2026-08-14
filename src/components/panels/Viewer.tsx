@@ -11,6 +11,15 @@ import css from "highlight.js/lib/languages/css";
 import "highlight.js/styles/monokai-sublime.css";
 import { useEffect, useRef } from "react";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { useFontSize } from "../../stores/useUIStore";
+import { cn } from "../../lib/utils";
+import { FontSize } from "../../lib/types";
+
+const proseSizeMap: Record<FontSize, string> = {
+  sm: "prose-sm",
+  md: "prose-base",
+  lg: "prose-lg",
+};
 
 hljs.registerLanguage("html", html);
 hljs.registerLanguage("css", css);
@@ -91,6 +100,7 @@ md.renderer.rules.link_open = (tokens, idx, options, _env, self) => {
 };
 
 export default function Viewer({ content }: { content: string }) {
+  const fontSize = useFontSize();
   const viewerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -114,7 +124,10 @@ export default function Viewer({ content }: { content: string }) {
   return (
     <div
       ref={viewerRef}
-      className="prose prose-zinc dark:prose-invert mx-auto max-w-2xl"
+      className={cn(
+        "prose prose-zinc dark:prose-invert mx-auto max-w-2xl",
+        proseSizeMap[fontSize],
+      )}
       dangerouslySetInnerHTML={{ __html: md.render(content) }}
     />
   );

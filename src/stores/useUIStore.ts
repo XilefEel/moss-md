@@ -4,7 +4,9 @@ import {
   saveIsSidebarOpen,
   saveIsRightbarOpen,
   saveViewMode,
+  saveFontSize,
 } from "../lib/storage";
+import { FontSize } from "../lib/types";
 
 type Mode = "view" | "edit" | null;
 
@@ -13,11 +15,13 @@ type UIStore = {
   isSidebarOpen: boolean | null;
   isRightbarOpen: boolean | null;
   isDirty: boolean;
+  fontSize: FontSize;
 
   setMode: (mode: Mode) => void;
   setIsSidebarOpen: (open: boolean) => void;
   setIsRightbarOpen: (open: boolean) => void;
   setIsDirty: (isDirty: boolean) => void;
+  setFontSize: (size: FontSize) => void;
 
   toggleMode: () => void;
   toggleSidebar: () => void;
@@ -29,10 +33,14 @@ const useUIStore = create<UIStore>((set, get) => ({
   isSidebarOpen: null,
   isRightbarOpen: null,
   isDirty: false,
+  fontSize: "md",
 
   setMode: (mode) => set({ mode }),
+
   setIsSidebarOpen: (open) => set({ isSidebarOpen: open }),
+
   setIsRightbarOpen: (open) => set({ isRightbarOpen: open }),
+
   setIsDirty: (isDirty) => set({ isDirty }),
 
   toggleMode: () => {
@@ -52,6 +60,11 @@ const useUIStore = create<UIStore>((set, get) => ({
     set({ isRightbarOpen: next });
     saveIsRightbarOpen(next);
   },
+
+  setFontSize: (size) => {
+    set({ fontSize: size });
+    saveFontSize(size);
+  },
 }));
 
 export const useMode = () => useUIStore((state) => state.mode);
@@ -64,6 +77,8 @@ export const useIsRightbarOpen = () =>
 
 export const useIsDirty = () => useUIStore((state) => state.isDirty);
 
+export const useFontSize = () => useUIStore((state) => state.fontSize);
+
 export const useUIActions = () =>
   useUIStore(
     useShallow((state) => ({
@@ -71,6 +86,7 @@ export const useUIActions = () =>
       setIsSidebarOpen: state.setIsSidebarOpen,
       setIsRightbarOpen: state.setIsRightbarOpen,
       setIsDirty: state.setIsDirty,
+      setFontSize: state.setFontSize,
 
       toggleMode: state.toggleMode,
       toggleSidebar: state.toggleSidebar,

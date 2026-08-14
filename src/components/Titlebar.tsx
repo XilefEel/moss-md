@@ -10,6 +10,7 @@ import {
   Plus,
   Search,
   Sun,
+  Type,
   X,
 } from "lucide-react";
 import { confirm } from "@tauri-apps/plugin-dialog";
@@ -19,9 +20,11 @@ import {
   useIsRightbarOpen,
   useIsDirty,
   useUIActions,
+  useFontSize,
 } from "../stores/useUIStore";
 
 const appWindow = getCurrentWindow();
+const sizeOrder = ["sm", "md", "lg"] as const;
 
 export default function Titlebar({
   isDark,
@@ -38,7 +41,9 @@ export default function Titlebar({
   const isSidebarOpen = useIsSidebarOpen();
   const isRightbarOpen = useIsRightbarOpen();
   const isDirty = useIsDirty();
-  const { toggleMode, toggleSidebar, toggleRightbar } = useUIActions();
+  const fontSize = useFontSize();
+  const { toggleMode, toggleSidebar, toggleRightbar, setFontSize } =
+    useUIActions();
 
   const handleClose = async () => {
     if (!isDirty) {
@@ -125,6 +130,17 @@ export default function Titlebar({
       )}
 
       <div className="ml-auto flex items-center gap-2.5">
+        <button
+          onClick={() => {
+            const nextIndex =
+              (sizeOrder.indexOf(fontSize) + 1) % sizeOrder.length;
+            setFontSize(sizeOrder[nextIndex]);
+          }}
+          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+        >
+          <Type className="size-4 shrink-0" />
+        </button>
+
         <button
           onClick={onToggleTheme}
           className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"

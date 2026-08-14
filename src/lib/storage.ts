@@ -1,4 +1,5 @@
 import { Store } from "@tauri-apps/plugin-store";
+import { FontSize } from "./types";
 
 let storePromise: Promise<Store> | null = null;
 
@@ -65,4 +66,12 @@ export async function getViewMode(): Promise<"view" | "edit" | null> {
 
 export async function saveViewMode(val: string) {
   return setItem("viewMode", val);
+}
+
+export async function getFontSize(): Promise<FontSize> {
+  return (await getItem<FontSize>("fontSize")) ?? "md";
+}
+
+export async function saveFontSize(val: FontSize) {
+  return setItem("fontSize", val);
 }

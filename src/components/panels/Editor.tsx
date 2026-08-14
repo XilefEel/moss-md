@@ -8,8 +8,11 @@ import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import { search, searchKeymap } from "@codemirror/search";
 import { placeholder } from "@codemirror/view";
+import { useFontSize } from "../../stores/useUIStore";
+import { FontSize } from "../../lib/types";
 
 const themeCompartment = new Compartment();
+const fontSizeCompartment = new Compartment();
 
 const lightTheme = EditorView.theme(
   {
@@ -89,6 +92,18 @@ const darkHighlight = HighlightStyle.define([
   { tag: t.quote, color: "#a1a1aa" },
 ]);
 
+const fontSizeMap: Record<FontSize, string> = {
+  sm: "14px",
+  md: "16px",
+  lg: "18px",
+};
+
+function fontSizeTheme(size: FontSize) {
+  return EditorView.theme({
+    "&": { fontSize: fontSizeMap[size] },
+  });
+}
+
 export default function Editor({
   content,
   onChange,
@@ -100,6 +115,7 @@ export default function Editor({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const fontSize = useFontSize();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -133,6 +149,7 @@ export default function Editor({
             syntaxHighlighting(isDark ? darkHighlight : lightHighlight),
             isDark ? darkTheme : lightTheme,
           ]),
+          fontSizeCompartment.of(fontSizeTheme(fontSize)),
         ],
       }),
       parent: containerRef.current,
@@ -162,6 +179,13 @@ export default function Editor({
       ]),
     });
   }, [isDark]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: fontSizeCompartment.reconfigure(fontSizeTheme(fontSize)),
+    });
+  }, [fontSize]);
 
   useEffect(() => {
     if (!containerRef.current) return;

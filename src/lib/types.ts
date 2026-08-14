@@ -11,3 +11,5 @@ export type SearchResult = {
   score: number;
   matches: number[];
 };
+
+export type FontSize = "sm" | "md" | "lg";

@@ -7,31 +7,32 @@ import {
   getLastFilePath,
   getIsSidebarOpen,
   getViewMode,
+  getFontSize,
 } from "../lib/storage";
 import { useFileTreeActions } from "../stores/useFileTreeStore";
+import { useUIActions } from "../stores/useUIStore";
 
 export function useRestoreSession({
   setContent,
   savedContentRef,
-  setIsSidebarOpen,
-  setMode,
 }: {
   setContent: (content: string) => void;
   savedContentRef: React.RefObject<string>;
-  setIsSidebarOpen: (isOpen: boolean) => void;
-  setMode: (mode: "edit" | "view") => void;
 }) {
   const { setCurrentFilePath, setCurrentDir, setOpenFolders } =
     useFileTreeActions();
 
+  const { setIsSidebarOpen, setMode, setFontSize } = useUIActions();
+
   useEffect(() => {
     const loadSession = async () => {
-      const [lastDir, lastFilePath, isSidebarOpen, viewMode] =
+      const [lastDir, lastFilePath, isSidebarOpen, viewMode, fontSize] =
         await Promise.all([
           getLastDir(),
           getLastFilePath(),
           getIsSidebarOpen(),
           getViewMode(),
+          getFontSize(),
         ]);
 
       if (lastDir) setCurrentDir(lastDir);
@@ -64,6 +65,8 @@ export function useRestoreSession({
       if (isSidebarOpen !== null) setIsSidebarOpen(isSidebarOpen);
 
       if (viewMode !== null) setMode(viewMode);
+
+      if (fontSize !== null) setFontSize(fontSize);
     };
 
     loadSession();

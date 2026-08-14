@@ -52,7 +52,6 @@ export default function App() {
   const isSidebarOpen = useIsSidebarOpen();
   const isRightbarOpen = useIsRightbarOpen();
   const {
-    setMode,
     setIsSidebarOpen,
     setIsRightbarOpen,
     setIsDirty,
@@ -140,8 +139,6 @@ export default function App() {
   useRestoreSession({
     setContent,
     savedContentRef,
-    setIsSidebarOpen,
-    setMode,
   });
 
   useDirWatcher(currentDir, refreshTree);
