@@ -22,6 +22,7 @@ import {
   useUIActions,
   useFontSize,
 } from "../stores/useUIStore";
+import { cn } from "../lib/utils";
 
 const appWindow = getCurrentWindow();
 const sizeOrder = ["sm", "md", "lg"] as const;
@@ -136,9 +137,20 @@ export default function Titlebar({
               (sizeOrder.indexOf(fontSize) + 1) % sizeOrder.length;
             setFontSize(sizeOrder[nextIndex]);
           }}
-          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+          className="flex items-center gap-0.5 text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
         >
           <Type className="size-4 shrink-0" />
+          <span className="flex flex-col-reverse gap-0.5">
+            {sizeOrder.map((s) => (
+              <span
+                key={s}
+                className={cn(
+                  "size-1 rounded-full",
+                  s === fontSize ? "bg-current" : "bg-current opacity-30",
+                )}
+              />
+            ))}
+          </span>
         </button>
 
         <button
