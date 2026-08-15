@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
-
 @custom-variant dark (&:is(.dark *));
 
 html,
@@ -56,44 +54,6 @@ body {
 .dark ::selection {
   background-color: rgb(from var(--color-emerald-800) r g b / 0.5);
   color: inherit;
-}
-
-.prose {
-  --tw-prose-body: var(--color-zinc-700);
-  --tw-prose-headings: var(--color-zinc-900);
-  --tw-prose-links: var(--color-zinc-900);
-  --tw-prose-bold: var(--color-zinc-900);
-  --tw-prose-quotes: var(--color-zinc-600);
-  --tw-prose-hr: var(--color-zinc-200);
-  --tw-prose-bullets: var(--color-zinc-400);
-}
-
-.dark .prose {
-  --tw-prose-body: var(--color-zinc-300);
-  --tw-prose-headings: var(--color-zinc-100);
-  --tw-prose-links: var(--color-zinc-100);
-  --tw-prose-bold: var(--color-zinc-100);
-  --tw-prose-quotes: var(--color-zinc-400);
-  --tw-prose-hr: var(--color-zinc-800);
-  --tw-prose-bullets: var(--color-zinc-600);
-}
-
-.prose :not(pre) > code {
-  background-color: var(--color-zinc-100);
-  color: var(--color-emerald-500);
-  font-weight: normal;
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.25rem;
-
-  .dark & {
-    background-color: var(--color-zinc-800);
-    color: var(--color-emerald-400);
-  }
-
-  &::before,
-  &::after {
-    content: none;
-  }
 }
 
 .cm-editor.cm-focused {
@@ -154,11 +114,6 @@ body {
 
 .dark .danger {
   background: rgb(from var(--color-red-500) r g b / 0.1);
-}
-
-pre code.hljs {
-  padding: 0;
-  background: transparent;
 }
 
 .cm-search {
@@ -289,4 +244,171 @@ pre code.hljs {
 .cm-search .cm-button[name="close"]:hover {
   color: var(--color-zinc-700) !important;
   background: transparent !important;
+}
+
+.markdown-body {
+  line-height: 1.75;
+  color: theme("colors.zinc.900");
+
+  .dark & {
+    color: theme("colors.zinc.100");
+  }
+
+  :first-child {
+    margin-top: 0;
+  }
+
+  p {
+    margin: 0.75em 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 700;
+    line-height: 1.2;
+    scroll-margin-top: 6em;
+  }
+
+  h1 {
+    font-size: 1.875em;
+    margin-top: 2.5em;
+    margin-bottom: 0.75em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    margin-top: 2em;
+    margin-bottom: 0.6em;
+  }
+
+  h3 {
+    font-size: 1.25em;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  h4 {
+    font-size: 1.125em;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+  }
+
+  a {
+    color: theme("colors.emerald.600");
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: theme("colors.emerald.700");
+    }
+
+    .dark & {
+      color: theme("colors.emerald.400");
+
+      &:hover {
+        color: theme("colors.emerald.300");
+      }
+    }
+  }
+
+  ul,
+  ol {
+    padding-left: 1.5em;
+    margin: 0.75em 0;
+    list-style-type: disc;
+
+    li {
+      margin: 0.2em 0;
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+
+  ol {
+    list-style-type: decimal;
+    padding-left: 2.5em;
+  }
+
+  hr {
+    margin: 2em 0;
+    border: none;
+    border-top: 1px solid theme("colors.zinc.200");
+
+    .dark & {
+      border-top-color: theme("colors.zinc.700");
+    }
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    border-radius: 0.75rem;
+    margin: 1.5em auto;
+  }
+
+  blockquote {
+    margin: 1.25em 0;
+    padding-left: 1em;
+    border-left: 4px solid theme("colors.emerald.400");
+    color: theme("colors.zinc.600");
+    font-style: normal;
+
+    .dark & {
+      border-left-color: theme("colors.emerald.500");
+      color: theme("colors.zinc.400");
+    }
+  }
+
+  code {
+    font-family: "JetBrainsMono", monospace;
+    font-size: 0.9em;
+    background: theme("colors.zinc.100");
+    padding: 0.15em 0.35em;
+    border-radius: 0.375rem;
+
+    .dark & {
+      background: theme("colors.zinc.800");
+    }
+  }
+
+  pre {
+    margin: 1.25em 0;
+    padding: 0em;
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    background: theme("colors.zinc.800");
+
+    code {
+      background: transparent;
+      padding: 1em;
+      font-size: 0.9em;
+    }
+  }
+
+  mark {
+    background-color: theme("colors.emerald.100");
+    color: inherit;
+    border-radius: 0.25em;
+    padding: 0.05em 0.15em;
+
+    .dark & {
+      background-color: theme("colors.emerald.700");
+    }
+  }
+}
+
+.markdown-body[data-text-size="sm"] {
+  font-size: 0.875rem;
+}
+
+.markdown-body[data-text-size="md"] {
+  font-size: 1rem;
+}
+
+.markdown-body[data-text-size="lg"] {
+  font-size: 1.125rem;
 }

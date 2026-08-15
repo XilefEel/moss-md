@@ -12,14 +12,6 @@ import "highlight.js/styles/monokai-sublime.css";
 import { useEffect, useRef } from "react";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { useFontSize } from "../../stores/useUIStore";
-import { cn } from "../../lib/utils";
-import { FontSize } from "../../lib/types";
-
-const proseSizeMap: Record<FontSize, string> = {
-  sm: "prose-sm",
-  md: "prose-base",
-  lg: "prose-lg",
-};
 
 hljs.registerLanguage("html", html);
 hljs.registerLanguage("css", css);
@@ -122,10 +114,8 @@ export default function Viewer({ content }: { content: string }) {
   return (
     <div
       ref={viewerRef}
-      className={cn(
-        "prose prose-zinc dark:prose-invert mx-auto max-w-2xl",
-        proseSizeMap[fontSize],
-      )}
+      className="markdown-body mx-auto max-w-2xl"
+      data-text-size={fontSize}
       dangerouslySetInnerHTML={{ __html: md.render(content) }}
     />
   );
