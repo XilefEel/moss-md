@@ -9,22 +9,22 @@ body {
 
 @layer base {
   @font-face {
-    font-family: "Inter";
-    src: url("./assets/fonts/Inter.ttf") format("truetype");
+    font-family: "Geist";
+    src: url("./assets/fonts/Geist.ttf") format("truetype");
   }
 
   @font-face {
-    font-family: "JetBrainsMono";
-    src: url("./assets/fonts/JetBrainsMono.ttf") format("truetype");
+    font-family: "GeistMono";
+    src: url("./assets/fonts/GeistMono.ttf") format("truetype");
   }
 
   body {
-    font-family: "Inter", sans-serif;
+    font-family: "Geist", sans-serif;
   }
 
   code,
   pre {
-    font-family: "JetBrainsMono", monospace;
+    font-family: "GeistMono", monospace;
   }
 }
 
@@ -122,7 +122,7 @@ body {
   background: var(--color-white) !important;
   border-top: 0 !important;
   padding: 0.5rem !important;
-  font-family: "Inter", sans-serif !important;
+  font-family: "Geist", sans-serif !important;
 
   .dark & {
     background: var(--color-zinc-900) !important;
@@ -364,7 +364,7 @@ body {
   }
 
   code {
-    font-family: "JetBrainsMono", monospace;
+    font-family: "GeistMono", monospace;
     font-size: 0.9em;
     background: theme("colors.zinc.100");
     padding: 0.15em 0.35em;
