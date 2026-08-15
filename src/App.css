@@ -399,6 +399,41 @@ body {
       background-color: theme("colors.emerald.700");
     }
   }
+
+  table {
+    width: 100%;
+    margin: 1.25em 0;
+    border-collapse: collapse;
+    font-size: 0.9em;
+  }
+
+  th,
+  td {
+    padding: 0.5em 0.75em;
+    border: 1px solid theme("colors.zinc.200");
+    text-align: left;
+
+    .dark & {
+      border-color: theme("colors.zinc.700");
+    }
+  }
+
+  th {
+    font-weight: 700;
+    background: theme("colors.zinc.50");
+
+    .dark & {
+      background: theme("colors.zinc.800");
+    }
+  }
+
+  tr:nth-child(even) td {
+    background: theme("colors.zinc.50");
+
+    .dark & {
+      background: rgb(from theme("colors.zinc.500") r g b / 0.05);
+    }
+  }
 }
 
 .markdown-body[data-text-size="sm"] {
