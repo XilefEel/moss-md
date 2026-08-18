@@ -18,6 +18,7 @@ fn opened_file(app: tauri::AppHandle) -> Option<String> {
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
+#[allow(unused_variables)]
 pub fn run() {
     let initial_path = extract_md_path(&std::env::args().collect::<Vec<_>>());
 
@@ -47,7 +48,7 @@ pub fn run() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|_app, _event| {
+        .run(|app, event| {
             #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Opened { urls } = event {
                 if let Some(url) = urls.first() {
