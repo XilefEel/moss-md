@@ -11,6 +11,7 @@ import {
 } from "../lib/storage";
 import { useFileTreeActions } from "../stores/useFileTreeStore";
 import { useUIActions } from "../stores/useUIStore";
+import { invoke } from "@tauri-apps/api/core";
 
 export function useRestoreSession({
   setContent,
@@ -26,14 +27,22 @@ export function useRestoreSession({
 
   useEffect(() => {
     const loadSession = async () => {
-      const [lastDir, lastFilePath, isSidebarOpen, viewMode, fontSize] =
-        await Promise.all([
+      const externalPath = await invoke<string | null>("opened_file");
+
+      let lastDir: string | null = null;
+      let lastFilePath: string | null = null;
+
+      if (!externalPath) {
+        [lastDir, lastFilePath] = await Promise.all([
           getLastDir(),
           getLastFilePath(),
-          getIsSidebarOpen(),
-          getViewMode(),
-          getFontSize(),
         ]);
+      }
+      const [isSidebarOpen, viewMode, fontSize] = await Promise.all([
+        getIsSidebarOpen(),
+        getViewMode(),
+        getFontSize(),
+      ]);
 
       if (lastDir) setCurrentDir(lastDir);
 

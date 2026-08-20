@@ -17,6 +17,11 @@ fn opened_file(app: tauri::AppHandle) -> Option<String> {
     app.state::<OpenedFile>().0.lock().unwrap().clone()
 }
 
+#[tauri::command]
+fn clear_opened_file(app: tauri::AppHandle) {
+    app.state::<OpenedFile>().0.lock().unwrap().take();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[allow(unused_variables)]
 pub fn run() {
@@ -44,7 +49,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             build_tree,
             fuzzy_search,
-            opened_file
+            opened_file,
+            clear_opened_file,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

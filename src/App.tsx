@@ -115,8 +115,6 @@ export default function App() {
     [setCurrentFilePath, setContent],
   );
 
-  useExternalFileOpen(handleSelectFile);
-
   const { isSearchOpen, setIsSearchOpen } = useKeyboardShortcuts({
     handleSave,
     handleOpen: handleOpenDirectory,
@@ -135,6 +133,8 @@ export default function App() {
     setIsSidebarOpen,
     setIsRightbarOpen,
   });
+
+  useExternalFileOpen(handleSelectFile);
 
   useRestoreSession({
     setContent,

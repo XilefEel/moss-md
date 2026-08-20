@@ -8,7 +8,10 @@ export function useExternalFileOpen(handleOpenFile: (path: string) => void) {
 
     (async () => {
       const initialPath = await invoke<string | null>("opened_file");
-      if (initialPath) handleOpenFile(initialPath);
+      if (initialPath) {
+        handleOpenFile(initialPath);
+        await invoke("clear_opened_file");
+      }
 
       unlisten = await listen<string>("opened-file", (event) => {
         handleOpenFile(event.payload);
