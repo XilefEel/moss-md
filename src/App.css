@@ -34,12 +34,21 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(16 185 129 / 0.3);
+  background-color: rgb(from var(--color-zinc-200) r g b / 0.5);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgb(from var(--color-zinc-700) r g b / 0.5);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(16 185 129 / 0.5);
+  background-color: rgb(from var(--color-zinc-300) r g b / 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(from var(--color-zinc-600) r g b / 0.5);
 }
 
 ::-webkit-scrollbar-track {
@@ -62,10 +71,10 @@ body {
 
 .cm-content {
   color: var(--color-zinc-700);
-}
 
-.dark .cm-content {
-  color: var(--color-zinc-300);
+  .dark & {
+    color: var(--color-zinc-300);
+  }
 }
 
 .custom-block-title {
@@ -77,10 +86,10 @@ body {
   padding: 0.25rem 1rem;
   border-radius: 0.375rem;
   margin: 1.5rem 0;
-}
 
-.dark .tip {
-  background: rgb(from var(--color-emerald-500) r g b / 0.1);
+  .dark & {
+    background: rgb(from var(--color-emerald-500) r g b / 0.1);
+  }
 }
 
 .info {
@@ -88,10 +97,10 @@ body {
   padding: 0.25rem 1rem;
   border-radius: 0.375rem;
   margin: 1.5rem 0;
-}
 
-.dark .info {
-  background: rgb(from var(--color-blue-500) r g b / 0.1);
+  .dark & {
+    background: rgb(from var(--color-blue-500) r g b / 0.1);
+  }
 }
 
 .warning {
@@ -99,10 +108,10 @@ body {
   padding: 0.25rem 1rem;
   border-radius: 0.375rem;
   margin: 1.5rem 0;
-}
 
-.dark .warning {
-  background: rgb(from var(--color-yellow-500) r g b / 0.1);
+  .dark & {
+    background: rgb(from var(--color-yellow-500) r g b / 0.1);
+  }
 }
 
 .danger {
@@ -110,10 +119,14 @@ body {
   padding: 0.25rem 1rem;
   border-radius: 0.375rem;
   margin: 1.5rem 0;
+
+  .dark & {
+    background: rgb(from var(--color-red-500) r g b / 0.1);
+  }
 }
 
-.dark .danger {
-  background: rgb(from var(--color-red-500) r g b / 0.1);
+.cm-content {
+  font-family: "Geist Mono", monospace;
 }
 
 .cm-search {
