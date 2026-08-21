@@ -1,27 +1,33 @@
 import { useEffect } from "react";
 import { PanelImperativeHandle, PanelSize } from "react-resizable-panels";
+import {
+  useIsSidebarOpen,
+  useIsRightbarOpen,
+  useUIActions,
+} from "../stores/useUIStore";
+import { saveIsRightbarOpen, saveIsSidebarOpen } from "../lib/storage";
 
 export function usePanelSync({
   sidebarRef,
   editorRef,
-  isSidebarOpen,
-  isRightbarOpen,
-  setIsSidebarOpen,
-  setIsRightbarOpen,
 }: {
   sidebarRef: React.RefObject<PanelImperativeHandle | null>;
   editorRef: React.RefObject<PanelImperativeHandle | null>;
-  isSidebarOpen: boolean | null;
-  isRightbarOpen: boolean | null;
-  setIsSidebarOpen: (open: boolean) => void;
-  setIsRightbarOpen: (open: boolean) => void;
 }) {
+  const isSidebarOpen = useIsSidebarOpen();
+  const isRightbarOpen = useIsRightbarOpen();
+  const { setIsSidebarOpen, setIsRightbarOpen } = useUIActions();
+
   const handleSidebarResize = (size: PanelSize) => {
-    setIsSidebarOpen(size.asPercentage !== 0);
+    const isOpen = size.asPercentage !== 0;
+    setIsSidebarOpen(isOpen);
+    saveIsSidebarOpen(isOpen);
   };
 
   const handleEditorResize = (size: PanelSize) => {
-    setIsRightbarOpen(size.asPercentage !== 0);
+    const isOpen = size.asPercentage !== 0;
+    setIsRightbarOpen(isOpen);
+    saveIsRightbarOpen(isOpen);
   };
 
   useEffect(() => {

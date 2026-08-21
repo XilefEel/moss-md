@@ -51,13 +51,7 @@ export default function App() {
   const mode = useMode();
   const isSidebarOpen = useIsSidebarOpen();
   const isRightbarOpen = useIsRightbarOpen();
-  const {
-    setIsSidebarOpen,
-    setIsRightbarOpen,
-    setIsDirty,
-    toggleMode,
-    toggleSidebar,
-  } = useUIActions();
+  const { setIsDirty, toggleMode, toggleSidebar } = useUIActions();
 
   const { isDark, toggleTheme } = useTheme();
 
@@ -128,10 +122,6 @@ export default function App() {
   const { handleSidebarResize, handleEditorResize } = usePanelSync({
     sidebarRef,
     editorRef,
-    isSidebarOpen,
-    isRightbarOpen,
-    setIsSidebarOpen,
-    setIsRightbarOpen,
   });
 
   useExternalFileOpen(handleSelectFile);
