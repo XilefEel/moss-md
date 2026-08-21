@@ -36,6 +36,7 @@ import { useFileDrop } from "./hooks/useFileDrop";
 import { usePanelSync } from "./hooks/usePanelSync";
 import { useDirWatcher } from "./hooks/useDirWatcher";
 import { useExternalFileOpen } from "./hooks/useExternalFileOpen";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 export default function App() {
   const [content, setContent] = useState("");
@@ -134,88 +135,93 @@ export default function App() {
   useDirWatcher(currentDir, refreshTree);
 
   return (
-    <div
-      className="flex h-screen flex-col bg-white dark:bg-zinc-900"
-      onContextMenu={(e) => e.preventDefault()}
-    >
-      {isDragging && (
-        <div className="absolute inset-0 z-9999 bg-emerald-500/10" />
-      )}
+    <Tooltip.Provider delayDuration={300}>
+      <div
+        className="flex h-screen flex-col bg-white dark:bg-zinc-900"
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        {isDragging && (
+          <div className="absolute inset-0 z-9999 bg-emerald-500/10" />
+        )}
 
-      <Titlebar
-        isDark={isDark}
-        onOpen={handleOpenDirectory}
-        onToggleTheme={toggleTheme}
-        onToggleSearch={() => setIsSearchOpen((open) => !open)}
-      />
+        <Titlebar
+          isDark={isDark}
+          onOpen={handleOpenDirectory}
+          onToggleTheme={toggleTheme}
+          onToggleSearch={() => setIsSearchOpen((open) => !open)}
+        />
 
-      <div className="flex h-screen">
-        <Group defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
-          <Panel
-            id="sidebar"
-            minSize="15%"
-            className="mt-12 mb-6"
-            panelRef={sidebarRef}
-            collapsible
-            onResize={handleSidebarResize}
+        <div className="flex h-screen">
+          <Group
+            defaultLayout={defaultLayout}
+            onLayoutChanged={onLayoutChanged}
           >
-            <Sidebar onSelectFile={handleSelectFile} />
-          </Panel>
+            <Panel
+              id="sidebar"
+              minSize="15%"
+              className="mt-12 mb-6"
+              panelRef={sidebarRef}
+              collapsible
+              onResize={handleSidebarResize}
+            >
+              <Sidebar onSelectFile={handleSelectFile} />
+            </Panel>
 
-          <Separator
-            className={cn(
-              "w-px cursor-col-resize bg-zinc-200 hover:bg-emerald-400 dark:bg-zinc-700 dark:hover:bg-emerald-500",
-              !isSidebarOpen && "hidden",
-            )}
-          />
+            <Separator
+              className={cn(
+                "w-px cursor-col-resize bg-zinc-200 hover:bg-emerald-400 dark:bg-zinc-700 dark:hover:bg-emerald-500",
+                !isSidebarOpen && "hidden",
+              )}
+            />
 
-          <Panel id="viewer" className="mt-8 mb-6 px-8" minSize="15%">
-            {mode === "view" ? (
-              <Viewer content={content} />
-            ) : (
-              <Editor
-                content={content}
-                onChange={handleContentChange}
-                isDark={isDark}
-              />
-            )}
-          </Panel>
+            <Panel id="viewer" className="mt-8 mb-6 px-8" minSize="15%">
+              {mode === "view" ? (
+                <Viewer content={content} />
+              ) : (
+                <Editor
+                  content={content}
+                  onChange={handleContentChange}
+                  isDark={isDark}
+                />
+              )}
+            </Panel>
 
-          <Separator
-            className={cn(
-              "w-px cursor-col-resize bg-zinc-200 hover:bg-emerald-400 dark:bg-zinc-700 dark:hover:bg-emerald-500",
-              !isRightbarOpen && "hidden",
-            )}
-          />
+            <Separator
+              className={cn(
+                "w-px cursor-col-resize bg-zinc-200 hover:bg-emerald-400 dark:bg-zinc-700 dark:hover:bg-emerald-500",
+                !isRightbarOpen && "hidden",
+              )}
+            />
 
-          <Panel
-            id="editor"
-            minSize="15%"
-            className="mt-8 mb-6 px-8"
-            panelRef={editorRef}
-            collapsible
-            onResize={handleEditorResize}
-          >
-            {mode === "edit" ? (
-              <Viewer content={content} />
-            ) : (
-              <Editor
-                content={content}
-                onChange={handleContentChange}
-                isDark={isDark}
-              />
-            )}
-          </Panel>
-        </Group>
+            <Panel
+              id="editor"
+              minSize="15%"
+              className="mt-8 mb-6 px-8"
+              panelRef={editorRef}
+              collapsible
+              onResize={handleEditorResize}
+            >
+              {mode === "edit" ? (
+                <Viewer content={content} />
+              ) : (
+                <Editor
+                  content={content}
+                  onChange={handleContentChange}
+                  isDark={isDark}
+                />
+              )}
+            </Panel>
+          </Group>
+        </div>
+
+        <BottomBar content={content} />
+
+        <SearchModal
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+          onSelect={handleSelectFile}
+        />
       </div>
-
-      <BottomBar content={content} />
-
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelect={handleSelectFile}
-      />
-    </div>
+    </Tooltip.Provider>
   );
 }

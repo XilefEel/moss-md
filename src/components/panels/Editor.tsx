@@ -29,9 +29,6 @@ const lightTheme = EditorView.theme(
     ".cm-gutters": {
       display: "none",
     },
-    "&.cm-focused .cm-cursor": {
-      borderLeftColor: "#10b981",
-    },
     "& .cm-selectionLayer .cm-selectionBackground": {
       backgroundColor:
         "rgb(from var(--color-emerald-200) r g b / 0.5) !important",
@@ -58,9 +55,6 @@ const darkTheme = EditorView.theme(
     },
     ".cm-gutters": {
       display: "none",
-    },
-    "&.cm-focused .cm-cursor": {
-      borderLeftColor: "#34d399",
     },
     "& .cm-selectionLayer .cm-selectionBackground": {
       backgroundColor:

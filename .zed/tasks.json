@@ -1,9 +1,0 @@
-[
-  {
-    "label": "Run Tauri Dev",
-    "command": "npm run tauri dev",
-    "shell": {
-      "program": "cmd.exe",
-    },
-  },
-]

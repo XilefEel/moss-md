@@ -23,6 +23,7 @@ import {
   useFontSize,
 } from "../stores/useUIStore";
 import { cn } from "../lib/utils";
+import TitlebarItem from "./TitlebarItem";
 
 const appWindow = getCurrentWindow();
 const sizeOrder = ["sm", "md", "lg"] as const;
@@ -100,30 +101,19 @@ export default function Titlebar({
       </div>
 
       <div className="flex items-center gap-2.5">
-        <button
-          onClick={toggleSidebar}
-          className="ml-auto text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-        >
-          {isSidebarOpen ? (
-            <PanelRightOpen className="size-4 shrink-0" />
-          ) : (
-            <PanelLeftOpen className="size-4 shrink-0" />
-          )}
-        </button>
+        <TitlebarItem
+          action={toggleSidebar}
+          content="Toggle Sidebar"
+          Icon={isSidebarOpen ? PanelLeftOpen : PanelRightOpen}
+        />
 
-        <button
-          onClick={onOpen}
-          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-        >
-          <FolderOpen className="size-4 shrink-0" />
-        </button>
+        <TitlebarItem
+          action={onOpen}
+          content="Open Directory"
+          Icon={FolderOpen}
+        />
 
-        <button
-          onClick={onToggleSearch}
-          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-        >
-          <Search className="size-4 shrink-0" />
-        </button>
+        <TitlebarItem action={onToggleSearch} content="Search" Icon={Search} />
       </div>
 
       {isDirty && (
@@ -131,13 +121,13 @@ export default function Titlebar({
       )}
 
       <div className="ml-auto flex items-center gap-2.5">
-        <button
-          onClick={() => {
+        <TitlebarItem
+          action={() => {
             const nextIndex =
               (sizeOrder.indexOf(fontSize) + 1) % sizeOrder.length;
             setFontSize(sizeOrder[nextIndex]);
           }}
-          className="flex items-center gap-0.5 text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+          content={`Font Size: ${fontSize.toUpperCase()}`}
         >
           <Type className="size-4 shrink-0" />
           <span className="flex flex-col-reverse gap-0.5">
@@ -151,40 +141,27 @@ export default function Titlebar({
               />
             ))}
           </span>
-        </button>
+        </TitlebarItem>
 
-        <button
-          onClick={onToggleTheme}
-          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-        >
-          {isDark ? (
-            <Sun className="size-4 shrink-0" />
-          ) : (
-            <Moon className="size-4 shrink-0" />
-          )}
-        </button>
+        <TitlebarItem
+          action={onToggleTheme}
+          content="Toggle Theme"
+          Icon={isDark ? Sun : Moon}
+        />
 
-        <button
-          onClick={toggleMode}
-          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-        >
-          {mode === "view" ? (
-            <Pencil className="size-4 shrink-0" />
-          ) : (
-            <Eye className="size-4 shrink-0" />
-          )}
-        </button>
+        <TitlebarItem
+          Icon={mode === "view" ? Pencil : Eye}
+          content={
+            mode === "view" ? "Switch to Edit Mode" : "Switch to View Mode"
+          }
+          action={toggleMode}
+        />
 
-        <button
-          onClick={toggleRightbar}
-          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-        >
-          {isRightbarOpen ? (
-            <PanelLeftOpen className="size-4 shrink-0" />
-          ) : (
-            <PanelRightOpen className="size-4 shrink-0" />
-          )}
-        </button>
+        <TitlebarItem
+          Icon={isRightbarOpen ? PanelLeftOpen : PanelRightOpen}
+          content="Toggle Rightbar"
+          action={toggleRightbar}
+        />
       </div>
     </div>
   );

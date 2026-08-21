@@ -116,7 +116,7 @@ export default function SearchModal({
           spellCheck={false}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search files..."
+          placeholder="Search files in the current directory..."
           className={cn(
             "w-full rounded-t-xl bg-transparent px-4 py-3 outline-none",
             "border-zinc-200 dark:border-zinc-800",
