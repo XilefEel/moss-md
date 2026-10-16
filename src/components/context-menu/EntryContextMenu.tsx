@@ -69,6 +69,8 @@ export default function FileTreeContextMenu({
             "z-50 flex min-w-44 flex-col gap-1 overflow-hidden rounded-lg p-2 shadow-md",
             "bg-white dark:bg-zinc-800",
             "border border-zinc-200 dark:border-zinc-700",
+            "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+            "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
           )}
         >
           <ContextMenuItem
