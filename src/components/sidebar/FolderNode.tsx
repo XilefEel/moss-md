@@ -1,5 +1,5 @@
 import { FolderOpen, FolderIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "../../lib/utils";
 import FileTree from "./FileTree";
 import {
@@ -29,7 +29,6 @@ export default function FolderNode({
     useFileTreeActions();
 
   const [isOpen, setIsOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const { ref: dragRef } = useDraggable({ id: entry.path });
   const { ref: dropRef, isDropTarget } = useDroppable({ id: entry.path });
@@ -59,6 +58,7 @@ export default function FolderNode({
   };
 
   const {
+    inputRef,
     value: name,
     setValue: setName,
     isEditing,

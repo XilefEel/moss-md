@@ -65,6 +65,7 @@ export default function FileTreeContextMenu({
 
       <ContextMenu.Portal>
         <ContextMenu.Content
+          onCloseAutoFocus={(e) => e.preventDefault()}
           className={cn(
             "z-50 flex min-w-44 flex-col gap-1 overflow-hidden rounded-lg p-2 shadow-md",
             "bg-white dark:bg-zinc-800",

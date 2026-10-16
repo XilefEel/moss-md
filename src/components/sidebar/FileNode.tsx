@@ -1,5 +1,5 @@
 import { FileText } from "lucide-react";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { cn } from "../../lib/utils";
 import {
   useCurrentFilePath,
@@ -21,7 +21,6 @@ export default function FileNode({
   const currentFile = useCurrentFilePath();
   const { setCurrentFilePath, renameEntry } = useFileTreeActions();
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const isActive = currentFile === entry.path;
 
   const { ref } = useDraggable({
@@ -42,6 +41,7 @@ export default function FileNode({
   };
 
   const {
+    inputRef,
     value: name,
     setValue: setName,
     isEditing,

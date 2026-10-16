@@ -12,7 +12,16 @@ export function useInlineEdit({
   const [isEditing, setIsEditing] = useState(false);
   const shouldSaveRef = useRef(true);
 
-  const handleBlur = async () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleBlur = async (e: React.FocusEvent) => {
+    const next = e.relatedTarget as HTMLElement | null;
+
+    if (next?.closest('[role="menu"], [role="menuitem"]')) {
+      requestAnimationFrame(() => inputRef.current?.focus());
+      return;
+    }
+
     setIsEditing(false);
     window.getSelection()?.removeAllRanges();
 
@@ -57,6 +66,7 @@ export function useInlineEdit({
   }, [initialValue]);
 
   return {
+    inputRef,
     value,
     setValue,
     isEditing,

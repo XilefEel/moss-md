@@ -37,7 +37,16 @@ export function NewEntryInput({
     if (newEntry.type === "file") onSelectFile(path);
   };
 
-  const handleBlur = () => setNewEntry(null);
+  const handleBlur = (e: React.FocusEvent) => {
+    const next = e.relatedTarget as HTMLElement | null;
+
+    if (next?.closest('[role="menu"], [role="menuitem"]')) {
+      requestAnimationFrame(() => inputRef.current?.focus());
+      return;
+    }
+
+    setNewEntry(null);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && name) handleConfirm();
