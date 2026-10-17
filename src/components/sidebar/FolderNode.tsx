@@ -1,6 +1,6 @@
 import { FolderOpen, FolderIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { cn } from "../../lib/utils";
+import { cn, formatDate } from "../../lib/utils";
 import FileTree from "./FileTree";
 import {
   useOpenFolders,
@@ -14,6 +14,7 @@ import { saveLastFilePath } from "../../lib/storage";
 import { useInlineEdit } from "../../hooks/useInlineEdit";
 import { NewEntryInput } from "./NewEntryInput";
 import { useDraggable, useDroppable } from "@dnd-kit/react";
+import { Tooltip } from "../tooltip/Tooltip";
 
 export default function FolderNode({
   entry,
@@ -113,45 +114,55 @@ export default function FolderNode({
           isDropTarget && "bg-emerald-50/40 dark:bg-emerald-900/20",
         )}
       >
-        <button
-          ref={setRefs}
-          onClick={handleToggleFolder}
-          className={cn(
-            "mb-1 flex w-full items-center gap-1 truncate rounded px-2 py-0.5 text-sm transition-colors",
-            "hover:bg-zinc-50 dark:hover:bg-zinc-700/50",
-            "text-zinc-800 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-zinc-100",
-          )}
+        <Tooltip
+          side="right"
+          content={
+            <div className="flex flex-col gap-1">
+              <p>Created at {formatDate(entry.createdAt)}</p>
+              <p>Last Modified at {formatDate(entry.modifiedAt)}</p>
+            </div>
+          }
         >
-          {isOpen ? (
-            <FolderOpen className="size-4 shrink-0" />
-          ) : (
-            <FolderIcon className="size-4 shrink-0" />
-          )}
-
-          <div
+          <button
+            ref={setRefs}
+            onClick={handleToggleFolder}
             className={cn(
-              "min-w-0 flex-1 rounded text-left",
-              isEditing &&
-                "bg-zinc-50 px-1 text-zinc-800 shadow-md ring-2 ring-emerald-500 dark:bg-zinc-800 dark:text-zinc-200",
+              "mb-1 flex w-full items-center gap-1 truncate rounded px-2 py-0.5 text-sm transition-colors",
+              "hover:bg-zinc-50 dark:hover:bg-zinc-700/50",
+              "text-zinc-800 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-zinc-100",
             )}
           >
-            <input
-              ref={inputRef}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              readOnly={!isEditing}
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
+            {isOpen ? (
+              <FolderOpen className="size-4 shrink-0" />
+            ) : (
+              <FolderIcon className="size-4 shrink-0" />
+            )}
+
+            <div
               className={cn(
-                "w-full truncate bg-transparent focus:outline-none",
-                !isEditing && "pointer-events-none",
+                "min-w-0 flex-1 rounded text-left",
+                isEditing &&
+                  "bg-zinc-50 px-1 text-zinc-800 shadow-md ring-2 ring-emerald-500 dark:bg-zinc-800 dark:text-zinc-200",
               )}
-            />
-          </div>
-        </button>
+            >
+              <input
+                ref={inputRef}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                readOnly={!isEditing}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                className={cn(
+                  "w-full truncate bg-transparent focus:outline-none",
+                  !isEditing && "pointer-events-none",
+                )}
+              />
+            </div>
+          </button>
+        </Tooltip>
 
         {failed && (
           <div className="mt-1 flex gap-1 px-2">

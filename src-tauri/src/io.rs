@@ -11,6 +11,8 @@ pub struct Entry {
     pub path: String,
     pub is_directory: bool,
     pub children: Option<Vec<Entry>>,
+    pub created_at: Option<u64>,
+    pub modified_at: Option<u64>,
 }
 
 #[derive(Serialize)]
@@ -26,12 +28,28 @@ fn read_dir(dir: &Path) -> std::io::Result<Vec<Entry>> {
     let mut entries = Vec::new();
 
     for entry in fs::read_dir(dir)? {
-        let entry = entry?;
+        let entry = match entry {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+
         let path = entry.path();
 
         let name = entry.file_name().to_string_lossy().into_owned();
         let path_str = path.to_string_lossy().into_owned();
         let is_dir = entry.file_type()?.is_dir();
+
+        let metadata = entry.metadata()?;
+        let created_at = metadata
+            .created()
+            .ok()
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| d.as_millis() as u64);
+        let modified_at = metadata
+            .modified()
+            .ok()
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| d.as_millis() as u64);
 
         if name.starts_with('.') {
             continue;
@@ -46,6 +64,8 @@ fn read_dir(dir: &Path) -> std::io::Result<Vec<Entry>> {
             path: path_str,
             is_directory: is_dir,
             children: if is_dir { Some(read_dir(&path)?) } else { None },
+            created_at,
+            modified_at,
         });
     }
 

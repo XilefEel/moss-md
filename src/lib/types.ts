@@ -3,6 +3,8 @@ export type Entry = {
   path: string;
   isDirectory: boolean;
   children: Entry[] | null;
+  createdAt: number;
+  modifiedAt: number;
 };
 
 export type SearchResult = {
