@@ -43,8 +43,8 @@ export default function Sidebar({
   }, [currentDir, refreshTree]);
 
   return (
-    <SidebarContextMenu>
-      <DragDropProvider onDragEnd={handleDragEnd}>
+    <DragDropProvider onDragEnd={handleDragEnd}>
+      <SidebarContextMenu>
         <RootDropZone dirPath={currentDir}>
           <div className="overflow-auto px-8">
             {currentDir ? (
@@ -64,8 +64,8 @@ export default function Sidebar({
             )}
           </div>
         </RootDropZone>
-      </DragDropProvider>
-    </SidebarContextMenu>
+      </SidebarContextMenu>
+    </DragDropProvider>
   );
 }
 
@@ -76,8 +76,7 @@ function RootDropZone({
   dirPath: string | null;
   children: React.ReactNode;
 }) {
-  const { ref } = useDroppable({ id: "__root__" });
-  if (!dirPath) return <>{children}</>;
+  const { ref } = useDroppable({ id: "__root__", disabled: !dirPath });
 
   return (
     <div ref={ref} className="flex h-full min-h-0 flex-col">

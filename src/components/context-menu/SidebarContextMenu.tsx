@@ -21,8 +21,8 @@ export default function SidebarContextMenu({
 
   return (
     <ContextMenu.Root>
-      <ContextMenu.Trigger asChild onContextMenu={(e) => e.stopPropagation()}>
-        {children}
+      <ContextMenu.Trigger asChild>
+        <div className="flex h-full min-h-0 flex-col">{children}</div>
       </ContextMenu.Trigger>
 
       <ContextMenu.Portal>
